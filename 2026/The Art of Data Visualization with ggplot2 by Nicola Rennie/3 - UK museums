@@ -1,1 +1,517 @@
+3 UK museums: highlighting line charts with gghighlight
 
+```{r}
+
+library(dplyr)
+library(gghighlight)
+library(ggplot2)
+library(ggtext)
+library(purrr)
+library(showtext)
+library(sysfonts)
+library(tibble)
+library(tidyr)
+library(tidytuesdayR)
+library(viridis)
+```
+
+```{r}
+#| label: download-data
+#| message: false
+
+tuesdata <- tt_load("2022-11-22")
+
+museums <- tuesdata$museums
+```
+
+#### How does the number of museums vary by index of deprivation?
+
+```{r}
+
+ggplot(
+  museums,
+  aes(Area_Deprivation_index)
+) +
+  geom_bar() + 
+  scale_x_continuous(breaks = 1:10)
+```
+
+#### Data wrangling
+
+```{r}
+
+head(museums$Year_opened, 4)
+
+head(museums$Year_closed, 4)
+```
+
+#### Separate year ranges
+
+```{r}
+
+museum_subset <- 
+  museums |>
+    select(
+      Year_opened, Year_closed, Area_Deprivation_index
+    ) |>
+    drop_na() |>
+    separate_wider_delim(
+      Year_opened,
+      delim = ":",
+      names = c("opened1", "opened2")
+    ) |>
+    separate_wider_delim(
+      Year_closed,
+      delim = ":",
+      names = c("closed1", "closed2")
+    ) |>
+    mutate(
+      across(
+        c(opened1, opened2, closed1, closed2), as.numeric
+      ),
+      Area_Deprivation_index = factor(
+        Area_Deprivation_index,
+        levels = 1:10
+      )
+    )
+```
+
+```{r}
+
+museum_data <- 
+  museum_subset |>
+    mutate(
+      across(
+        c(closed1, closed2),
+        ~ if_else(.x == 9999, NA_real_, .x)
+      )
+    ) |>
+    mutate(
+      closed = case_when(
+        closed1 == closed2 ~ closed1,
+        closed1 != closed2 ~ round((closed2 + closed1) / 2)
+      )
+    ) |>
+    mutate(
+      opened = case_when(
+        opened1 == opened2 ~ opened1,
+        opened1 != opened2 ~ round((opened2 + opened1) / 2)
+      )
+    ) |>
+    select(
+      Area_Deprivation_index, 
+      opened, 
+      closed
+    ) |>
+    rename(deprivation = Area_Deprivation_index) |>
+    arrange(deprivation)
+
+```
+
+```{r}
+
+head(museum_data)
+```
+
+#### How many museums were open in a given year for each level of deprivation?
+
+```{r}
+
+num_year <- 
+  function(year, dep, data = museum_data) {
+    df <- filter(data, deprivation == dep)
+    num_open <- sum(df$opened <= year)
+    num_closed <- sum(df$closed <= year, na.rm = TRUE)
+    diff <- num_open - num_closed
+    return(diff)
+  }
+
+```
+
+```{r}
+num_year(1980, 3)
+```
+
+#### Convert the output into a matrix where each column is a level of deprivation, and each row is a year
+
+```{r}
+
+all_years <- 1960:2021
+
+deps <- 1:10
+
+output <- 
+  pmap_vec(
+    expand.grid(all_years, deps),
+    ~ num_year(year = .x, dep = .y)
+  )
+
+results <- 
+  matrix(
+    output,
+    nrow = length(all_years),
+    byrow = FALSE
+  )
+
+colnames(results) <- 1:10
+
+```
+
+```{r}
+
+head(results)
+```
+
+#### Convert to tibble
+
+```{r}
+
+plot_data <- 
+  results |>
+  as_tibble() |>
+  mutate(year = all_years) |>
+  pivot_longer(
+    -year,
+    names_to = "deprivation",
+    values_to = "museums"
+  ) |>
+  mutate(
+    deprivation = factor(deprivation, levels = 1:10)
+  )
+```
+
+#### First plot
+
+```{r}
+
+ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = year,
+    y = museums,
+    color = deprivation
+  )
+) +
+  geom_line()
+```
+
+#### Facet deprivation
+
+```{r}
+
+ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = year, 
+    y = museums, 
+    fill = deprivation
+  )
+) +
+  geom_area() +
+  facet_wrap(~ deprivation, nrow = 2)
+```
+
+#### Highlighte lines
+
+```{r}
+
+ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = year,
+    y = museums,
+    color = deprivation
+  )
+) +
+  geom_line() +
+  facet_wrap(~ deprivation, nrow = 2) +
+  gghighlight(use_direct_label = FALSE)
+```
+
+#### For each year calculate the percentage change since 1960
+
+```{r}
+
+lookup <- 
+  plot_data |>
+  filter(year == 1960) |>
+  select(deprivation, museums)
+
+new_plot_data <- 
+  plot_data |>
+  left_join(lookup, by = "deprivation") |>
+  rename(
+    museums = museums.x,
+    museums_1960 = museums.y
+  ) |>
+  mutate(
+    change = (
+      100 * (museums - museums_1960) / museums_1960
+    )
+  ) |>
+  select(year, deprivation, change)
+```
+
+#### Redo line chart with change
+
+```{r}
+
+basic_plot <- 
+  ggplot(
+    data = new_plot_data,
+    mapping = aes(
+      x = year, 
+      y = change, 
+      color = deprivation
+    )
+  ) +
+    geom_line() +
+    facet_wrap(~ deprivation, nrow = 2) +
+    gghighlight(use_direct_label = FALSE)
+
+basic_plot
+```
+
+#### Colors for text and background
+
+```{r}
+
+bg_col <- "#FAFAFA"
+text_col <- "black"
+```
+
+#### Color palette for lines
+
+```{r}
+
+col_plot <- 
+  basic_plot +
+  scale_color_viridis(
+    discrete = TRUE,
+    direction = -1
+  )
+
+col_plot
+```
+
+#### Text & Fonts
+
+```{r}
+
+font_add_google(name = "Raleway")
+showtext_auto()
+showtext_opts(dpi = 300)
+
+body_font <- "Raleway"
+```
+
+```{r}
+
+title <- 
+  "Are there fewer museums opening in more deprived areas?"
+
+st <- 
+  "The change in the estimated number of open museums since 1960 is significantly lower in areas with higher levels of deprivation. *Since around 2000, the number of open museums has stagnated across all areas, regardless of deprivation index. However, the rate of growth prior to this stagnation is lower in more deprived areas."
+
+cap <- 
+  "*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).<br><br>**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.<br><br>N. Rennie | Data: museweb.dcs.bbk.ac.uk"
+```
+
+```{r}
+
+text_plot <- 
+  col_plot +
+    labs(
+      title = title, 
+      subtitle = st, 
+      caption = cap,
+      x = "",
+      y = "% change in estimated number of\nopen museums since 1960**"
+    )
+```
+
+#### Adjusting themes
+
+```{r}
+
+text_plot +
+  scale_y_continuous(limits = c(0, 300)) +
+  coord_cartesian(expand = FALSE) +
+  theme_minimal(base_size = 7, base_family = body_font) +
+  theme(
+    legend.position = "none",
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    panel.spacing = unit(1, "lines"),
+    plot.margin = margin(10, 15, 10, 10),
+    plot.background = element_rect(
+      fill = bg_col, 
+      color = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, 
+      color = bg_col
+    ),
+    plot.title = element_textbox_simple(
+      color = text_col,
+      lineheight = 0.5,
+      size = rel(1.2),
+      face = "bold",
+      margin = margin(b = 5)
+    ),
+    plot.subtitle = element_textbox_simple(
+      color = text_col,
+      lineheight = 0.5
+    ),
+    plot.caption = element_textbox_simple(
+      hjust = 0,
+      color = text_col,
+      lineheight = 0.5
+    ),
+    axis.text = element_text(
+      color = text_col,
+      lineheight = 0.5
+    )
+  )
+```
+
+```{r}
+
+ggsave(
+  filename = "museums.png",
+  width = 5,
+  height = 0.67 * 5
+)
+```
+
+## **Exercises**
+
+Edit the visualization to use a single color (of your choice) to highlight each line, instead of the viridis color palette.
+
+```{r}
+
+basic_plot_exercise <- 
+  ggplot(
+    data = new_plot_data,
+    mapping = aes(
+      x = year, 
+      y = change, 
+      color = deprivation
+    )
+  ) +
+    geom_line() +
+    facet_wrap(~ deprivation, nrow = 2) +
+    gghighlight(
+      use_direct_label = FALSE,
+      unhighlighted_params = list(color = "grey80", linewidth = 0.5) 
+    ) 
+
+basic_plot_exercise
+```
+
+```{r}
+
+col_plot_exercise <- 
+  basic_plot_exercise +
+  scale_color_manual(values = rep("#A91E45FF", 10))
+
+col_plot_exercise
+```
+
+```{r}
+ggplot(
+  data = plot_data,
+  mapping = aes(
+    x = year,
+    y = museums,
+    color = deprivation
+  )
+) +
+  geom_line() +
+  facet_wrap(~ deprivation, nrow = 2) +
+  gghighlight(use_direct_label = FALSE)
+```
+
+```{r}
+
+font_add_google(name = "Raleway")
+showtext_auto()
+showtext_opts(dpi = 300)
+
+body_font <- "Raleway"
+```
+
+```{r}
+
+title <- 
+  "Are there fewer museums opening in more deprived areas?"
+
+st <- 
+  "The change in the estimated number of open museums since 1960 is significantly lower in areas with higher levels of deprivation. *Since around 2000, the number of open museums has stagnated across all areas, regardless of deprivation index. However, the rate of growth prior to this stagnation is lower in more deprived areas."
+
+cap <- 
+  "*The Index of Multiple Deprivation (IMD) measures the relative deprivation of geographic areas in the UK, aggregating different dimensions (income, employment, education, health, crime, housing, and living environment). The index ranges from 1 (most deprived) to 10 (least deprived).<br><br>**In some instances it has been impossible to establish an exact opening or closing date for a museum. In these cases, museums’ opening and closing dates are taken to be the mid point of a specified range of possible dates.<br><br>N. Rennie | Data: museweb.dcs.bbk.ac.uk"
+```
+
+```{r}
+
+text_plot_exercise <- 
+  col_plot_exercise +
+    labs(
+      title = title, subtitle = st, caption = cap,
+      x = "",
+      y = "% change in estimated number of\nopen museums since 1960**"
+    )
+```
+
+```{r}
+
+text_plot_exercise +
+  scale_y_continuous(limits = c(0, 300)) +
+  coord_cartesian(expand = FALSE) +
+  theme_minimal(base_size = 7, base_family = body_font) +
+  theme(
+    legend.position = "none",
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    panel.spacing = unit(1, "lines"),
+    plot.margin = margin(10, 15, 10, 10),
+    plot.background = element_rect(
+      fill = bg_col, 
+      color = bg_col
+    ),
+    panel.background = element_rect(
+      fill = bg_col, 
+      color = bg_col
+    ),
+    plot.title = element_textbox_simple(
+      color = text_col,
+      lineheight = 0.5,
+      size = rel(1.2),
+      face = "bold",
+      margin = margin(b = 5)
+    ),
+    plot.subtitle = element_textbox_simple(
+      color = text_col,
+      lineheight = 0.5
+    ),
+    plot.caption = element_textbox_simple(
+      hjust = 0,
+      color = text_col,
+      lineheight = 0.5
+    ),
+    axis.text = element_text(
+      color = text_col,
+      lineheight = 0.5
+    )
+  )
+```
+
+```{r}
+
+ggsave(
+  filename = "museums_exsercise.png",
+  width = 5,
+  height = 0.67 * 5
+)
+```
