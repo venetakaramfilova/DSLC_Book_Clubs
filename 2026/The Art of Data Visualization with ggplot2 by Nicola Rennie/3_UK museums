@@ -378,7 +378,7 @@ text_plot +
 ```{r}
 
 ggsave(
-  filename = "museums.png",
+  filename = "3_UK museums.png",
   width = 5,
   height = 0.67 * 5
 )
@@ -510,7 +510,7 @@ text_plot_exercise +
 ```{r}
 
 ggsave(
-  filename = "museums_exsercise.png",
+  filename = "3_UK museums_exsercise.png",
   width = 5,
   height = 0.67 * 5
 )
