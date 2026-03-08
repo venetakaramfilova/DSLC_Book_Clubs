@@ -16,9 +16,6 @@ library(viridis)
 ```
 
 ```{r}
-#| label: download-data
-#| message: false
-
 tuesdata <- tt_load("2022-11-22")
 
 museums <- tuesdata$museums
