@@ -256,7 +256,7 @@ ggplot(
 6.  What does the `na.rm` argument do in [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to `TRUE`.
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | `na.rm` | If `FALSE`, the default, missing values are removed with a warning. If `TRUE`, missing values are silently removed. |
 
 ```{r}
@@ -325,7 +325,7 @@ ggplot(
 9.  Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | `se` | Display confidence band around smooth? (`TRUE` by default, see `level` to control.) |
 
 ```{r}
