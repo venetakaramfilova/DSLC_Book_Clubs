@@ -4,13 +4,19 @@ format: html
 editor: visual
 ---
 
+### **1.1 Introduction**
+
 ```{r}
+#| message: false
+#| warning: false
 
 library(tidyverse)
 library(palmerpenguins)
 library(ggthemes)
 # https://ggplot2.tidyverse.org/
 ```
+
+### **1.2 First steps**
 
 The penguins data frame
 
@@ -41,6 +47,8 @@ ggplot(
 “What does the relationship between flipper length and body mass look like?” The relationship appears to be positive (as flipper length increases, so does body mass), fairly linear (the points are clustered around a line instead of a curve), and moderately strong (there isn’t too much scatter around such a line). Penguins with longer flippers are generally larger in terms of their body mass.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -55,6 +63,8 @@ ggplot(
 Does the relationship between flipper length and body mass differ by species?
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -70,6 +80,8 @@ ggplot(
 Add one more layer: a smooth curve displaying the relationship between body mass and flipper length
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -86,6 +98,8 @@ ggplot(
 When aesthetic mappings are defined in [`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html), at the *global* level, they’re passed down to each of the subsequent geom layers of the plot. However, each geom function in ggplot2 can also take a `mapping` argument, which allows for aesthetic mappings at the *local* level that are added to those inherited from the global level. Since we want points to be colored based on species but don’t want the lines to be separated out for them, we should specify `color = species` for [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html) only.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -105,6 +119,8 @@ ggplot(
 It’s generally not a good idea to represent information using only colors on a plot, as people perceive colors differently due to color blindness or other color vision differences. Therefore, in addition to color, we can also map `species` to the `shape` aesthetic.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -125,6 +141,8 @@ ggplot(
 Improve the labels using the [`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) function in a new layer
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -167,6 +185,7 @@ glimpse(penguins)
 bill_depth_mm a number denoting bill depth (millimeters)
 
 ```{r}
+#| eval: false
 
 ?palmerpenguins::penguins
 
@@ -178,6 +197,8 @@ bill_depth_mm a number denoting bill depth (millimeters)
 There is no strong linear relationship between bill length and bill depth overall. Instead, the pattern forms distinct clusters by species, each with its own shape and slope
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins,
@@ -196,6 +217,8 @@ ggplot(
 A scatterplot assumes both axes are numeric. But species is categorical, so all points for each species stack vertically at a single x‑position.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins,
@@ -220,6 +243,8 @@ Gentoo penguins are clearly different from the other two species in bill depth, 
 The boxplots show that Gentoo penguins have the shallowest bills, while Adelie and Chinstrap have deeper bills with similar medians and overlapping distributions.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins,
@@ -236,6 +261,7 @@ ggplot(
 The variables to be plotted are not defined.
 
 ```{r}
+#| eval: false
 
 ggplot(data = penguins) + 
   geom_point()
@@ -256,10 +282,12 @@ ggplot(
 6.  What does the `na.rm` argument do in [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to `TRUE`.
 
 |  |  |
-|------------------------------------|------------------------------------|
+|----|----|
 | `na.rm` | If `FALSE`, the default, missing values are removed with a warning. If `TRUE`, missing values are silently removed. |
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins,
@@ -304,9 +332,11 @@ ggplot(
 
 `bill_depth_mm` should be mapped to color
 
-![](images/unnamed-chunk-16-1.png)
+![](images/clipboard-3533690625.png)
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins,
@@ -325,10 +355,12 @@ ggplot(
 9.  Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
 
 |  |  |
-|------------------------------------|------------------------------------|
+|----|----|
 | `se` | Display confidence band around smooth? (`TRUE` by default, see `level` to control.) |
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -361,6 +393,8 @@ So both layers use the same data and same aesthetics.
 In the second plot, each geom gets its own data + aes. But since both layers receive the same data and the same mapping, the result is identical.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -390,9 +424,13 @@ ggplot() +
   )
 ```
 
+### **1.3 ggplot2 calls**
+
 The arguments "data" and "mapping" can be omitted when writing the expression. Below plots will both work and produce the same output.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -416,6 +454,9 @@ ggplot(
 The pipe, \|\> will allow you to create that plot with:
 
 ```{r}
+#| message: false
+#| warning: false
+
 penguins |>    
 ggplot(
   aes(
@@ -425,6 +466,8 @@ ggplot(
 ) +    
   geom_point()
 ```
+
+### **1.4 Visualizing distributions**
 
 Categorical variable
 
@@ -451,6 +494,8 @@ ggplot(
 Numerical variable
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -462,6 +507,8 @@ ggplot(
 Exploring "binwidth"
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -481,6 +528,8 @@ Density plot
 It shows fewer details than a histogram but can make it easier to quickly glean the shape of the distribution, particularly with respect to modes and skewness.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -572,11 +621,15 @@ ggplot(
   geom_histogram(binwidth = 0.01)
 ```
 
+## **1.5 Visualizing relationships**
+
 **Visualizing relationships between a numerical and a categorical variable.**
 
 geom_boxplot() uses Tukey's boxplot
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -591,6 +644,8 @@ ggplot(
  density plots
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -605,6 +660,8 @@ ggplot(
 We can map `species` to both `color` and `fill` aesthetics and use the `alpha` aesthetic to add transparency to the filled density curves. This aesthetic takes values between 0 (completely transparent) and 1 (completely opaque)
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -665,6 +722,8 @@ ggplot(
 **Visualizing relationships between 2 numerical variables.**
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -681,6 +740,8 @@ ggplot(
 The colors of points represent species and the shapes of points represent islands.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -700,6 +761,8 @@ ggplot(
 Facet your plot by a single variable. The variable that's passed to facet_wrap() should be categorical.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -723,7 +786,7 @@ ggplot(
 
 ```{r}
 
-glipmse(mpg)
+glimpse(mpg)
 ```
 
 2.  Make a scatterplot of `hwy` vs. `displ` using the `mpg` data frame. Next, map a third, numerical variable to `color`, then `size`, then both `color` and `size`, then `shape`. How do these aesthetics behave differently for categorical vs. numerical variables?
@@ -781,6 +844,7 @@ ggplot(
 ```
 
 ```{r}
+#| eval: false
 
 # A continuous variable cannot be mapped to the shape aesthetic
 
@@ -796,6 +860,8 @@ ggplot(
 ```
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   mpg,
@@ -813,6 +879,8 @@ ggplot(
 linewidth is an aesthetic for geoms that draw lines, so ggplot2 simply drops this argument.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   mpg,
@@ -846,6 +914,8 @@ ggplot(
 Coloring exposes a pattern that is completely hidden in the uncolored scatterplot - the relationship is species‑specific, not global.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -872,6 +942,8 @@ ggplot(
 6.  Why does the following yield two separate legends? How would you fix it to combine the two legends?
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -887,6 +959,8 @@ ggplot(
 ```
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   data = penguins,
@@ -935,9 +1009,11 @@ ggplot(
   geom_bar(position = "fill")
 ```
 
-### **Saving plots**
+### **1.6 Saving plots**
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   penguins, 
@@ -984,6 +1060,8 @@ Change the file extension from .png to .pdf
 The documentation says it recognizes formats such as pdf, png, jpeg, tiff, bmp, svg, and some others.
 
 ```{r}
+#| message: false
+#| warning: false
 
 ggplot(
   mpg, 
@@ -996,4 +1074,3 @@ ggplot(
 
 ggsave("mpg-plot.pdf")
 ```
-
