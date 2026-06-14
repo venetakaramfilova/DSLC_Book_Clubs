@@ -4,9 +4,9 @@ format: html
 editor: visual
 ---
 
-#### **2.1 Coding basics**
+### **2.1 Coding basics**
 
-Basic math calculations
+### Basic math calculations
 
 ```{r}
 
@@ -17,7 +17,7 @@ Basic math calculations
 sin(pi / 2)
 ```
 
-Create new objects
+### Create new objects
 
 ```{r}
 
@@ -26,7 +26,7 @@ x <- 3 * 4
 x
 ```
 
-Combine multiple elements into a vector
+### Combine multiple elements into a vector
 
 ```{r}
 
@@ -34,7 +34,7 @@ primes <-
   c(2, 3, 5, 7, 11, 13)
 ```
 
-Basic arithmetic on vectors is applied to every element of the vector
+### Basic arithmetic on vectors is applied to every element of the vector
 
 ```{r}
 
@@ -43,7 +43,7 @@ primes * 2
 primes - 1
 ```
 
-Create object
+### Create object
 
 ```{r}
 
@@ -51,7 +51,7 @@ Create object
 x <- 5
 ```
 
-#### **2.2 Comments**
+### **2.2 Comments**
 
 ```{r}
 
@@ -63,7 +63,7 @@ primes <-
 primes * 2
 ```
 
-#### **2.4 Calling functions**
+### **2.4 Calling functions**
 
 ```{r}
 
@@ -72,7 +72,7 @@ seq(from = 1, to = 10)
 seq(1, 10)
 ```
 
-#### **2.5 Exercises**
+### **2.5 Exercises**
 
 1.  Why does this code not work? - "i"
 
