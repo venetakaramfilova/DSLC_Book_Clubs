@@ -18,7 +18,7 @@ library(ggthemes)
 
 ### **1.2 First steps**
 
-The penguins data frame
+#### The penguins data frame
 
 ```{r}
 
@@ -26,7 +26,7 @@ glimpse(penguins)
 View(penguins)
 ```
 
-Creating a plot
+#### Creating a plot
 
 ```{r}
 
@@ -469,7 +469,7 @@ ggplot(
 
 ### **1.4 Visualizing distributions**
 
-Categorical variable
+#### Categorical variable
 
 ```{r}
 
@@ -491,7 +491,7 @@ ggplot(
   geom_bar()
 ```
 
-Numerical variable
+#### Numerical variable
 
 ```{r}
 #| message: false
@@ -504,7 +504,7 @@ ggplot(
   geom_histogram(binwidth = 200)
 ```
 
-Exploring "binwidth"
+#### Exploring "binwidth"
 
 ```{r}
 #| message: false
@@ -523,7 +523,7 @@ ggplot(
   geom_histogram(binwidth = 2000)
 ```
 
-Density plot
+#### Density plot
 
 It shows fewer details than a histogram but can make it easier to quickly glean the shape of the distribution, particularly with respect to modes and skewness.
 
@@ -621,11 +621,11 @@ ggplot(
   geom_histogram(binwidth = 0.01)
 ```
 
-## **1.5 Visualizing relationships**
+### **1.5 Visualizing relationships**
 
-**Visualizing relationships between a numerical and a categorical variable.**
+### Visualizing relationships between a numerical and a categorical variable.
 
-geom_boxplot() uses Tukey's boxplot
+#### geom_boxplot() uses Tukey's boxplot
 
 ```{r}
 #| message: false
@@ -641,7 +641,7 @@ ggplot(
   geom_boxplot()
 ```
 
- density plots
+#### density plots
 
 ```{r}
 #| message: false
@@ -674,7 +674,7 @@ ggplot(
   geom_density(alpha = 0.5)
 ```
 
-**Visualizing relationships between 2 categorical variables.**
+### Visualizing relationships between 2 categorical variables.
 
 The first plot shows the frequencies of each species of penguins on each island.
 
@@ -719,7 +719,7 @@ ggplot(
   labs(y = "proportion")
 ```
 
-**Visualizing relationships between 2 numerical variables.**
+### Visualizing relationships between 2 numerical variables.
 
 ```{r}
 #| message: false
@@ -735,7 +735,7 @@ ggplot(
   geom_point()
 ```
 
-**Visualizing relationships between 3 or more variables.**
+### Visualizing relationships between 3 or more variables.
 
 The colors of points represent species and the shapes of points represent islands.
 
