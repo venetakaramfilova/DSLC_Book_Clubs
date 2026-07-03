@@ -1,0 +1,89 @@
+---
+title: "Notes on The Effect An Introduction to Research Design and Causality by Nick Huntington-Klein"
+format: pdf
+editor: visual
+---
+
+### **Chapter 1 - Designing Research**
+
+### What is a research question
+
+A research question is a clear, focused question that your study is designed to answer. It states exactly what issue, relationship, or phenomenon you want to investigate.
+
+**Key elements:**
+
+- It is based on a research problem or gap in existing knowledge and points to what needs further investigation.
+
+- It guides the entire research process: what data you collect, which methods you use, and how you analyze and interpret results.
+
+**Good research questions are:**
+
+- Specific, concise, and understandable to others without extra explanation.
+
+- Researchable (you can answer them with data) and open-ended enough that the answer is not trivial or already known.
+
+### Research question types
+
+There are several common ways to classify research question types. The main ones you’ll see in methodology texts are:
+
+#### By logical aim:
+
+- **Descriptive** – ask “what is…?” or “how much/how many…?” and aim to describe characteristics, patterns, or prevalence.
+
+  - Example: “What are the main factors influencing customer churn in telecom companies?”
+
+- **Relational / correlational** – ask about relationships between variables, without necessarily claiming causality.
+
+  - Example: “Is there a relationship between weekly screen time and self‑reported stress levels among adults?”
+
+- **Causal / explanatory** – ask whether one variable causes or affects another.
+
+  - Example: “What is the effect of participation in a data‑literacy training program on analysts’ report accuracy?”
+
+#### By data paradigm
+
+- **Quantitative research questions** – framed around variables, measurement, and statistical relationships (e.g. “To what extent…?”, “What is the effect of X on Y…?”).
+
+- **Qualitative research questions** – framed around meanings, experiences, processes (e.g. “How do…?”, “Why do…?”, “In what ways…?”).
+
+Many guides first ask “Is your study quantitative, qualitative, or mixed‑methods?” and then shape the question accordingly (e.g. quantitative descriptive vs. qualitative exploratory).
+
+#### More fine‑grained types you may see:
+
+Different authors and courses introduce slightly richer taxonomies; common labels include:
+
+- **Comparative** – focus on differences/similarities between groups, conditions, or time periods.
+
+  - Example: “How does job satisfaction differ between remote and on‑site data analysts?”
+
+- **Predictive** – focus on forecasting or prediction accuracy.
+
+  - Example: “To what extent can historical purchase behavior predict future churn among retail customers?”
+
+- **Exploratory** – used in under‑researched areas; broad, open‑ended questions to identify patterns or themes.
+
+  - Example: “How do junior data scientists describe the main challenges in adopting MLOps practices?”
+
+- **Evaluation** – assess effectiveness, impact, or outcomes of a program, policy, or intervention.
+
+  - Example: “How effective is a weekly code‑review practice in reducing production bugs in analytics pipelines?”
+
+- **Action‑oriented / design / improvement** – aim at finding solutions or informing change.
+
+  - Example: “What process changes can reduce report refresh time in a Power BI environment?”
+
+### What is empirical
+
+**Empirical** means “based on experience, observation, or experiment,” rather than only on theory.
+
+- **Core meaning**
+
+  - Empirical data: data you actually observe or measure in the real world (experiments, surveys, logs, etc.), not just results from assumptions or theory.
+
+  - Empirical approach: making conclusions from evidence and experience, instead of purely from abstract reasoning.
+
+- **In science and data work**
+
+  - An empirical study is a study that collects real-world data (observations, experiments, questionnaires) and analyzes it to answer a question or test a hypothesis.
+
+  - In contrast, a purely theoretical study works with models, proofs, or simulations that are not directly tied to observed data.
