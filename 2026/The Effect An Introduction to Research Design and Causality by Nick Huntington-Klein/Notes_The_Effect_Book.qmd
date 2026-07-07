@@ -1,10 +1,12 @@
 ---
-title: "Notes on The Effect An Introduction to Research Design and Causality by Nick Huntington-Klein"
+title: "Notes on The Effect: An Introduction to Research Design and Causality by Nick Huntington-Klein"
 format: pdf
 editor: visual
 ---
 
-### **Chapter 1 - Designing Research**
+# **Chapter 1 - Designing Research**
+
+## **1.1 I Have a Question**
 
 ### What is a research question
 
@@ -72,6 +74,8 @@ Different authors and courses introduce slightly richer taxonomies; common label
 
   - Example: “What process changes can reduce report refresh time in a Power BI environment?”
 
+## **1.2 Empirical Research**
+
 ### What is empirical
 
 **Empirical** means “based on experience, observation, or experiment,” rather than only on theory.
@@ -87,3 +91,70 @@ Different authors and courses introduce slightly richer taxonomies; common label
   - An empirical study is a study that collects real-world data (observations, experiments, questionnaires) and analyzes it to answer a question or test a hypothesis.
 
   - In contrast, a purely theoretical study works with models, proofs, or simulations that are not directly tied to observed data.
+
+*One particularly sticky problem with quantitative empirical research is that the numbers that we observe often don’t tell us exactly what we want to know.*
+
+## **1.3 Why Research Needs a Design**
+
+Why is it so important for research to be properly designed? One way we can think about this is by looking at what happens when it’s not.
+
+? Research in an empirical context needs a design because the design is what turns an interesting idea or question into a coherent, valid, and reproducible study that can actually answer that question.
+
+### **1.4 In This Book**
+
+**Part I** focuses on the logic of design: how to formulate a clear, answerable causal question and then reason about what kind of quantitative empirical study could address it. It guides you to decide what needs to be measured and how to check that your proposed approach really targets the question you care about.
+
+**Part II** turns to the methods toolbox: it presents standard causal inference techniques for using observational data when you cannot run an experiment. These methods are widely used because they work in many applied settings and rest on assumptions that are now well studied and relatively well understood.
+
+### Homework for Chapter 2: Research Questions
+
+1. What is data mining useful for? What are its limitations?
+
+2. Are each of the following questions a good research question? Explain your reasoning. If the question is not good, suggest ways to make it a better question if possible. 
+
+    a. Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?
+    
+    b. Are dogs the best pets?
+    
+    c. Do organic labels in grocery store items increase sales of those items?
+
+3. Think about a possible research question in your field of study (e.g., your major).
+
+    a. Can this question be answered? Is it feasible to answer it?
+    
+    b. Does the question answer something about how the world works? If so, how?
+    
+    c. Write down some hypotheses based on the question. 
+    
+    d. What kind of data needs to be collected to test the hypothesis?
+
+4. For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?). 
+
+    a. Theory: 
+        - People donate to political campaigns largely because they want to defeat a political opponent, not because they like the candidate they’re donating to.
+    
+        Research question: 
+        - Do negative advertisements increase political campaign donations in US Congressional races more than positive advertisements do?
+    
+    b. Theory: 
+        - men have higher average salaries than women in the US partially because employers discriminate against women in job interviews
+    
+        Research question: 
+        - Does the use of a gender-blind interview process, where hiring decisions and salary offers are made without knowing the employee’s gender, shrink the salary gap between men and women?
+        
+    
+    c. Theory: 
+        - Living in a rich country improves happiness.
+    
+        Research question: 
+        - Do people who live in richer countries on average report higher happiness levels?
+        
+    
+    d. Theory: 
+        - Many plants survive without eating because they collect energy from sunlight.
+
+        Research question: 
+        - Are plants that live underneath a thick canopy (where little light can get through) less healthy than those in a loose canopy?
+    
+
+
