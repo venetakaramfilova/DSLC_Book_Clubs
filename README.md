@@ -4,7 +4,7 @@
 A friendly weekly meet, organized by the [Data Science Learning Community](https://dslc.io/bookclubs.html) where participants read a single book, covering a data-related topic.
 
 ## Objective
-Keep a diary of the books read, code and exercises tested.
+Keep a diary of books read, code, notes taken and exercises tested.
 
 ## Structure
-Folders are organized chronologically by book read, and contain a file for each chapter.
+Folders are organized chronologically by year in which the book was read, and contain a file for each chapter.
