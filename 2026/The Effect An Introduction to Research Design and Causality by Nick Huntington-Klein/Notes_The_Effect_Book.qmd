@@ -24,33 +24,33 @@ A research question is a clear, focused question that your study is designed to 
 
 - Researchable (you can answer them with data) and open-ended enough that the answer is not trivial or already known.
 
-### Research question types
+**Research question types**
 
 There are several common ways to classify research question types. The main ones you’ll see in methodology texts are:
 
-#### By logical aim:
+- **By logical aim:**
 
-- **Descriptive** – ask “what is…?” or “how much/how many…?” and aim to describe characteristics, patterns, or prevalence.
+  - **Descriptive** – ask “what is…?” or “how much/how many…?” and aim to describe characteristics, patterns, or prevalence.
+  
+    - Example: “What are the main factors influencing customer churn in telecom companies?”
+  
+  - **Relational / correlational** – ask about relationships between variables, without necessarily claiming causality.
+  
+    - Example: “Is there a relationship between weekly screen time and self‑reported stress levels among adults?”
+  
+  - **Causal / explanatory** – ask whether one variable causes or affects another.
+  
+    - Example: “What is the effect of participation in a data‑literacy training program on analysts’ report accuracy?”
 
-  - Example: “What are the main factors influencing customer churn in telecom companies?”
+- **By data paradigm**
 
-- **Relational / correlational** – ask about relationships between variables, without necessarily claiming causality.
-
-  - Example: “Is there a relationship between weekly screen time and self‑reported stress levels among adults?”
-
-- **Causal / explanatory** – ask whether one variable causes or affects another.
-
-  - Example: “What is the effect of participation in a data‑literacy training program on analysts’ report accuracy?”
-
-#### By data paradigm
-
-- **Quantitative research questions** – framed around variables, measurement, and statistical relationships (e.g. “To what extent…?”, “What is the effect of X on Y…?”).
-
-- **Qualitative research questions** – framed around meanings, experiences, processes (e.g. “How do…?”, “Why do…?”, “In what ways…?”).
+  - **Quantitative research questions** – framed around variables, measurement, and statistical relationships (e.g. “To what extent…?”, “What is the effect of X on Y…?”).
+  
+  - **Qualitative research questions** – framed around meanings, experiences, processes (e.g. “How do…?”, “Why do…?”, “In what ways…?”).
 
 Many guides first ask “Is your study quantitative, qualitative, or mixed‑methods?” and then shape the question accordingly (e.g. quantitative descriptive vs. qualitative exploratory).
 
-#### More fine‑grained types you may see:
+**More fine‑grained types you may see:**
 
 Different authors and courses introduce slightly richer taxonomies; common labels include:
 
@@ -106,11 +106,153 @@ Why is it so important for research to be properly designed? One way we can thin
 
 **Part II** turns to the methods toolbox: it presents standard causal inference techniques for using observational data when you cannot run an experiment. These methods are widely used because they work in many applied settings and rest on assumptions that are now well studied and relatively well understood.
 
-### Homework for Chapter 2: Research Questions
+### **Homework for Chapter 2: Research Questions**
 
-1. What is data mining useful for? What are its limitations?
+**1. What is data mining useful for? What are its limitations?**
 
-2. Are each of the following questions a good research question? Explain your reasoning. If the question is not good, suggest ways to make it a better question if possible. 
+**Core purposes**
+
+Data mining helps identify patterns, correlations, and anomalies that are not obvious through simple descriptive analysis, using machine learning, statistics, and AI. These patterns can then be used to understand current behavior (diagnostic/analytic) and to forecast future outcomes (predictive).
+
+In research, data mining is very useful for finding correlations and associations, but it does not, by itself, establish causation; you need explicit causal designs or models on top of the mined patterns. Used carefully, it can generate hypotheses about possible causal mechanisms that you then test with appropriate methods (experiments, quasi‑experiments, causal inference frameworks).
+
+**Correlation, association, and data mining**
+
+Data mining excels at uncovering **associations** and **correlations** in large, complex datasets by systematically scanning for regularities, co‑occurrences, and predictive relationships. This includes tasks like association rule mining, clustering, and predictive modeling, which reveal “X tends to occur with Y” or “Y can be predicted from X” without assuming any causal direction.
+
+A key issue is that data mining can easily produce large numbers of **spurious correlations** — patterns that are statistically real but substantively meaningless. **Correlation does not imply causation** is especially critical in the context of big data and automated pattern search, because sheer volume guarantees you will find many misleading associations. 
+
+**Why correlation ≠ causation**
+
+Correlation (or association) means two variables tend to vary together, while causation implies that changes in one variable directly bring about changes in another. In scientific terms, causation requires a mechanism plus a set of conditions (temporality, non‑spuriousness, and, often, counterfactual reasoning) that can’t be confirmed simply by observing co‑variation in observational data.
+
+Big data and data mining increase statistical power and make it easier to detect correlations, but they do not remove core identification problems such as confounding, selection bias, and reverse causality. There is ongoing debate about whether big data alone can “upgrade” correlations to causation, with most methodological work agreeing that you still need strong research designs or causal models, not just more data.
+
+***Role of data mining in research workflows***
+
+In research settings, data mining is typically used as:
+
+- A hypothesis generation tool: scanning large datasets to find interesting, unexpected correlations that may suggest new causal questions (“Could X be influencing Y?”).
+
+- A variable and feature discovery tool: identifying promising predictors, interactions, and latent groupings, which can then be formalized in statistical or causal models.
+
+- A pattern characterization tool: providing rich descriptive insight into how phenomena cluster or co‑vary across populations, contexts, or time.
+
+**Data mining and causal inference**
+
+There is growing work on combining data mining with causal inference, but the causal claims come from the identification strategy, not from the mining step itself. Approaches include:
+
+- Using data mining to select covariates, identify strata, or discover heterogeneity, then applying causal methods such as matching, inverse probability weighting, difference‑in‑differences, or instrumental variables.
+
+- Embedding causal graphs (DAGs) or potential‑outcomes reasoning into machine‑learning workflows, so that algorithms respect causal assumptions (e.g., learning treatment effect heterogeneity rather than just prediction accuracy).
+
+**Practical implications for research**
+
+For empirical work, a useful way to frame it is: data mining is excellent for **finding and summarizing correlations,** but you should treat those as inputs into a separate causal analysis pipeline. Typical best practices include:
+
+- Explicitly distinguishing exploratory (data mining) from confirmatory (causal testing) phases in your project documentation and analysis plans.
+
+- Using mined patterns to refine theory, operationalize constructs, and build candidate models, while reserving strong causal language (“effect”, “impact”, “causes”) for results backed by identification strategies.
+
+- Guarding against spurious correlations by cross‑validation, out‑of‑sample checks, and, where possible, triangulation with experiments, quasi‑experiments, or longitudinal designs.
+
+***A quasi‑experiment*** *is a study that tries to estimate causal effects by manipulating an intervention, but without random assignment of units to treatment and control groups. It “resembles” a true experiment in structure, yet lacks at least one key experimental safeguard—usually randomization.*
+
+***Core definition***
+
+*In a quasi‑experimental design, the researcher still defines an independent variable (the “treatment” or intervention) and observes its effect on a dependent variable, but participants or units end up in groups based on real‑world criteria rather than random assignment. This is why quasi‑experiments are often described as “natural” or “real‑world” experiments: the researcher leverages existing groups or policies instead of creating them randomly.*
+
+***How it differs from a true experiment***
+
+*In a classic randomized controlled trial (RCT), randomization ensures that, on average, treatment and control groups are equivalent on both observed and unobserved characteristics at baseline. In a quasi‑experiment, group differences can exist before the intervention (e.g., different schools, regions, firms, time periods), which introduces threats to internal validity. As a result, quasi‑experimental causal claims rely on design and analytic adjustments—rather than randomization—to argue that alternative explanations (confounding, selection bias) have been minimized.*
+
+***Typical quasi‑experimental designs***
+
+*Common quasi‑experimental structures include:*
+
+- *Nonequivalent control group designs: compare outcomes between a “treated” group and a similar but non‑random control group (e.g., two schools, one adopts a new curriculum, one does not).*
+
+- *Interrupted time series designs: examine outcomes measured repeatedly over time, before and after an intervention or event, to see whether there is a clear “break” in the trend at the intervention point.*
+
+- *Difference‑in‑differences and related panel designs: compare changes over time between treated and untreated groups, assuming that in the absence of treatment they would have followed parallel trends.*
+
+*All of these manipulate or at least exploit an intervention but use design logic (timing, comparison groups, trends) instead of random assignment to make causal inferences.*
+
+***Why quasi‑experiments are used***
+
+*Quasi‑experiments are especially valuable when randomization is impossible, unethical, or politically infeasible—for example:*
+
+- *Evaluating a nationwide policy that applies to everyone in a particular jurisdiction.*
+
+- *Studying the impact of natural events (economic shocks, disasters, pandemics).*
+
+- *Assessing organizational changes where management will not randomize units.*
+
+*They give you a structured way to approximate experimental logic in field conditions, which is why they are heavily used in public policy, education, labor markets, health services, and other applied social science settings.*
+
+***Causal inference and limitations***
+
+*From a causal‑inference standpoint:*
+
+- ***Strength:*** *Quasi‑experiments are usually much stronger than purely observational cross‑sectional correlations because the intervention precedes the outcome and the design explicitly leverages comparison groups or time patterns.*
+
+- ***Weakness:*** *They are more vulnerable than RCTs to confounding and selection bias, since units self‑select or are administratively assigned to conditions. Researchers must therefore carefully justify assumptions (e.g., parallel trends, no unmeasured confounders that change at the intervention point) and often perform robustness and sensitivity analyses.*
+
+***Association rule mining***  *is a data mining technique for discovering “if‑then” patterns of co‑occurrence between items in large datasets, typically expressed as rules like 𝑋→𝑌(“if X occurs, Y tends to occur too”). It’s a classic unsupervised method used to uncover associations rather than to predict a labeled outcome.*
+
+***Core idea***
+
+*Association rule mining scans collections of transactions or events (e.g., shopping baskets, page visits, diagnoses) to find item combinations that occur together more often than you’d expect by chance. Each discovered pattern is formalized as an association rule with an antecedent (left‑hand side, the “if” part) and a consequent (right‑hand side, the “then” part).*
+
+*Example in market‑basket data:*
+
+- *Rule: {bread, butter} → {jam}*
+*This can be interpreted as: in transactions where bread and butter are bought, jam is frequently bought as well.*
+
+***Key measures: support, confidence, lift***
+*Three core metrics are used to evaluate rules:*
+
+- *Support: How frequently a set of items appears in the dataset (joint occurrence).*
+
+- *Confidence: The conditional probability of the consequent given the antecedent; intuitively, how often the rule is correct when the antecedent holds.*
+
+- *Lift (and related measures): How much more often antecedent and consequent occur together than you would expect if they were independent; used to filter out rules that are high‑confidence but trivial or spurious.*
+
+*Frequent itemsets are first identified based on minimum support, and then association rules are generated from those itemsets that also meet minimum confidence (and often lift) thresholds.*
+
+***Algorithms commonly used***
+
+*Classic algorithms for association rule mining include:*
+
+- *Apriori: Level‑wise search over itemsets, using the property that all subsets of a frequent itemset must themselves be frequent to prune the search space.*
+
+- *FP‑Growth: Builds a compact tree structure (FP‑tree) of frequent patterns and mines itemsets without generating as many candidate sets as Apriori.*
+
+- *Eclat: Uses a vertical data format (item → list of transaction IDs) and intersection of transaction ID sets to find frequent itemsets.*
+
+*In practice, these algorithms are wrapped in libraries (e.g., the arules package in R) and tuned via minsup, minconf, and sometimes minlift to control the number and quality of rules.*
+
+***Typical use cases***
+
+*Association rule mining is widely used for:*
+
+- *Market basket analysis: Product bundling, shelf placement, cross‑selling (“customers who buy X often buy Y”).*
+
+- *Recommender systems: Suggest related items or content based on co‑view/co‑purchase patterns.*
+
+- *Web and app analytics: Common navigation paths, sequences that lead to conversion or drop‑off.*
+
+- *Healthcare and operations: Co‑occurring symptoms, tests, or procedures; common failure combinations in equipment logs.*
+
+**Relation to correlation and causation***
+
+*Conceptually, association rules describe correlations/associations, not causation: they tell you that items co‑occur, not that one causes the other. For research workflows, they are typically used for:*
+
+- *Exploratory analyses and hypothesis generation.*
+
+- *Discovering interesting behavioral or operational patterns that can later be tested in more formal, causal designs.*
+
+**2. Are each of the following questions a good research question? Explain your reasoning. If the question is not good, suggest ways to make it a better question if possible.**
 
     a. Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?
     
