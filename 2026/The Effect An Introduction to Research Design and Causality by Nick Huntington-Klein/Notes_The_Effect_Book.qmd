@@ -128,7 +128,7 @@ Correlation (or association) means two variables tend to vary together, while ca
 
 Big data and data mining increase statistical power and make it easier to detect correlations, but they do not remove core identification problems such as confounding, selection bias, and reverse causality. There is ongoing debate about whether big data alone can “upgrade” correlations to causation, with most methodological work agreeing that you still need strong research designs or causal models, not just more data.
 
-***Role of data mining in research workflows***
+**Role of data mining in research workflows**
 
 In research settings, data mining is typically used as:
 
@@ -404,36 +404,76 @@ These versions:
 
     d.  What kind of data needs to be collected to test the hypothesis?
 
-4.  For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?).
+**4.  For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?).**
 
-    a.  Theory:
+**Theory:**
 
-        - People donate to political campaigns largely because they want to defeat a political opponent, not because they like the candidate they’re donating to.
+- People donate to political campaigns largely because they want to defeat a political opponent, not because they like the candidate they’re donating to.
 
-        Research question:
+**Research question:**
 
-        - Do negative advertisements increase political campaign donations in US Congressional races more than positive advertisements do?
+- Do negative advertisements increase political campaign donations in US Congressional races more than positive advertisements do?
+        
+**Does the question inform the theory:**
 
-    b.  Theory:
+Yes, it’s quite well aligned. If negative ads (which focus on attacking an opponent) increase donations more than positive ads (which emphasize liking or supporting the candidate), that pattern supports the idea that donations are primarily motivated by a desire to defeat the opponent rather than by admiration for “our” candidate.
 
-        - men have higher average salaries than women in the US partially because employers discriminate against women in job interviews
+If you find that negative ads substantially boost donations relative to positive ads, that is evidence consistent with the theory.
 
-        Research question:
+If positive ads are equally or more effective, that would challenge the theory (suggesting liking/support may matter as much or more than opposition).
 
-        - Does the use of a gender-blind interview process, where hiring decisions and salary offers are made without knowing the employee’s gender, shrink the salary gap between men and women?
+So, answering this question would tell you something meaningful about whether the motivational emphasis in donations is “anti-opponent” versus “pro-candidate.”
 
-    c.  Theory:
+**Theory:**
 
-        - Living in a rich country improves happiness.
+- Men have higher average salaries than women in the US partially because employers discriminate against women in job interviews
 
-        Research question:
+**Research question:**
 
-        - Do people who live in richer countries on average report higher happiness levels?
+- Does the use of a gender-blind interview process, where hiring decisions and salary offers are made without knowing the employee’s gender, shrink the salary gap between men and women?
 
-    d.  Theory:
+**Does the question inform the theory?**
 
-        - Many plants survive without eating because they collect energy from sunlight.
+Yes, very directly. The theory posits discrimination in interviews as a causal mechanism contributing to the gender salary gap. A gender‑blind interview is, in effect, an intervention that removes the proposed mechanism at hiring.
 
-        Research question:
+If introducing gender‑blind interviews leads to a smaller salary gap (controlling for other factors), that supports the idea that discrimination in interviews is one reason for the gap.
 
-        - Are plants that live underneath a thick canopy (where little light can get through) less healthy than those in a loose canopy?
+If the gap remains unchanged, that suggests either (a) discrimination is happening at other stages (promotion, performance evaluation, negotiation) or (b) other mechanisms (e.g., occupational sorting, hours worked) are more important than interview discrimination.
+
+So this question is a strong theory‑informing test because it targets the specific causal channel the theory highlights.
+
+**Theory:**
+
+- Living in a rich country improves happiness.
+
+**Research question:**
+
+- Do people who live in richer countries on average report higher happiness levels?
+
+**Does the question inform the theory?**
+
+Yes, but somewhat coarsely. The theory is about causation (living in a rich country → higher happiness), while the research question is about cross‑national association (richer countries ↔ higher average reported happiness).
+
+If people in richer countries do report higher happiness on average, that pattern is consistent with the theory, but doesn’t by itself prove causation (rich countries differ in many things besides income: institutions, culture, welfare systems, etc.).
+
+If there is no association, or if poorer countries are as happy or happier, that would challenge the theory’s claim that richness per se improves happiness.
+
+So the question definitely informs the theory (it checks a key empirical implication), but it doesn’t fully isolate the causal effect of wealth from other country‑level factors. A more causally focused design (e.g., looking at changes over time as countries become richer, or using quasi‑experimental shocks) would inform the theory even more strongly.
+
+**Theory:**
+
+- Many plants survive without eating because they collect energy from sunlight.
+
+**Research question:**
+
+- Are plants that live underneath a thick canopy (where little light can get through) less healthy than those in a loose canopy?
+
+**Does the question inform the theory?**
+
+Yes, indirectly but meaningfully. The theory says plants are sustained by energy from sunlight, so reduced light should, in general, reduce plant health (all else equal).
+
+If plants under thick canopy (i.e., with low light) are less healthy than those under loose canopy (more light), that is consistent with the theory that sunlight is a key energy source.
+
+If they are equally healthy, or healthier, that would suggest either (a) these plants have strong adaptations (e.g., shade tolerance, alternative energy pathways), or (b) the simple statement “many plants survive because of sunlight” needs to be qualified.
+
+This question doesn’t test the mechanism as directly as, say, controlled experiments varying light intensity, but the observed health differences under different light conditions still provide evidence relevant to the theory.
