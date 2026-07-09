@@ -31,21 +31,21 @@ There are several common ways to classify research question types. The main ones
 - **By logical aim:**
 
   - **Descriptive** – ask “what is…?” or “how much/how many…?” and aim to describe characteristics, patterns, or prevalence.
-  
+
     - Example: “What are the main factors influencing customer churn in telecom companies?”
-  
+
   - **Relational / correlational** – ask about relationships between variables, without necessarily claiming causality.
-  
+
     - Example: “Is there a relationship between weekly screen time and self‑reported stress levels among adults?”
-  
+
   - **Causal / explanatory** – ask whether one variable causes or affects another.
-  
+
     - Example: “What is the effect of participation in a data‑literacy training program on analysts’ report accuracy?”
 
 - **By data paradigm**
 
   - **Quantitative research questions** – framed around variables, measurement, and statistical relationships (e.g. “To what extent…?”, “What is the effect of X on Y…?”).
-  
+
   - **Qualitative research questions** – framed around meanings, experiences, processes (e.g. “How do…?”, “Why do…?”, “In what ways…?”).
 
 Many guides first ask “Is your study quantitative, qualitative, or mixed‑methods?” and then shape the question accordingly (e.g. quantitative descriptive vs. qualitative exploratory).
@@ -120,7 +120,7 @@ In research, data mining is very useful for finding correlations and association
 
 Data mining excels at uncovering **associations** and **correlations** in large, complex datasets by systematically scanning for regularities, co‑occurrences, and predictive relationships. This includes tasks like association rule mining, clustering, and predictive modeling, which reveal “X tends to occur with Y” or “Y can be predicted from X” without assuming any causal direction.
 
-A key issue is that data mining can easily produce large numbers of **spurious correlations** — patterns that are statistically real but substantively meaningless. **Correlation does not imply causation** is especially critical in the context of big data and automated pattern search, because sheer volume guarantees you will find many misleading associations. 
+A key issue is that data mining can easily produce large numbers of **spurious correlations** — patterns that are statistically real but substantively meaningless. **Correlation does not imply causation** is especially critical in the context of big data and automated pattern search, because sheer volume guarantees you will find many misleading associations.
 
 **Why correlation ≠ causation**
 
@@ -198,7 +198,7 @@ For empirical work, a useful way to frame it is: data mining is excellent for **
 
 - ***Weakness:*** *They are more vulnerable than RCTs to confounding and selection bias, since units self‑select or are administratively assigned to conditions. Researchers must therefore carefully justify assumptions (e.g., parallel trends, no unmeasured confounders that change at the intervention point) and often perform robustness and sensitivity analyses.*
 
-***Association rule mining***  *is a data mining technique for discovering “if‑then” patterns of co‑occurrence between items in large datasets, typically expressed as rules like 𝑋→𝑌(“if X occurs, Y tends to occur too”). It’s a classic unsupervised method used to uncover associations rather than to predict a labeled outcome.*
+***Association rule mining*** *is a data mining technique for discovering “if‑then” patterns of co‑occurrence between items in large datasets, typically expressed as rules like 𝑋→𝑌(“if X occurs, Y tends to occur too”). It’s a classic unsupervised method used to uncover associations rather than to predict a labeled outcome.*
 
 ***Core idea***
 
@@ -206,11 +206,9 @@ For empirical work, a useful way to frame it is: data mining is excellent for **
 
 *Example in market‑basket data:*
 
-- *Rule: {bread, butter} → {jam}*
-*This can be interpreted as: in transactions where bread and butter are bought, jam is frequently bought as well.*
+- *Rule: {bread, butter} → {jam}* *This can be interpreted as: in transactions where bread and butter are bought, jam is frequently bought as well.*
 
-***Key measures: support, confidence, lift***
-*Three core metrics are used to evaluate rules:*
+***Key measures: support, confidence, lift*** *Three core metrics are used to evaluate rules:*
 
 - *Support: How frequently a set of items appears in the dataset (joint occurrence).*
 
@@ -244,7 +242,7 @@ For empirical work, a useful way to frame it is: data mining is excellent for **
 
 - *Healthcare and operations: Co‑occurring symptoms, tests, or procedures; common failure combinations in equipment logs.*
 
-**Relation to correlation and causation***
+***Relation to correlation and causation***
 
 *Conceptually, association rules describe correlations/associations, not causation: they tell you that items co‑occur, not that one causes the other. For research workflows, they are typically used for:*
 
@@ -253,50 +251,189 @@ For empirical work, a useful way to frame it is: data mining is excellent for **
 - *Discovering interesting behavioral or operational patterns that can later be tested in more formal, causal designs.*
 
 **2. Are each of the following questions a good research question? Explain your reasoning. If the question is not good, suggest ways to make it a better question if possible.**
+       
+  **- Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?**
+  
+Is it a good research question?
 
-    a. Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?
-    
-    b. Are dogs the best pets?
-    
-    c. Do organic labels in grocery store items increase sales of those items?
+Mostly yes: it’s causal, focused on a specific exposure (severe hurricanes) and outcome (psychological disorders), and a defined target group (children in gestation during the hurricanes). The main issues are lack of operational definitions and feasibility.
 
-3. Think about a possible research question in your field of study (e.g., your major).
+Points in favor:
 
-    a. Can this question be answered? Is it feasible to answer it?
-    
-    b. Does the question answer something about how the world works? If so, how?
-    
-    c. Write down some hypotheses based on the question. 
-    
-    d. What kind of data needs to be collected to test the hypothesis?
+- Clear causal structure: exposure (hurricane during gestation) → outcome (later psychological disorders).
 
-4. For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?). 
+- Population is at least implicitly defined (children who were in utero at the time of the hurricane).
 
-    a. Theory: 
+Limitations:
+
+- “Severe hurricanes” is not operationalized (e.g., category, wind speed, economic damage, proximity of residence).
+
+- “Psychological disorders” is broad; clinical diagnosis, screening scores, age at assessment, and specific disorders would need specification.
+
+No time frame (e.g., assessed at age 5, 10, adolescence).
+
+How to make it better:
+
+Does prenatal exposure to Category 3 or higher hurricanes increase the incidence of clinically diagnosed anxiety and depressive disorders at age 10 among children whose mothers lived in affected coastal regions?
+
+- Exposure defined: Category 3+ hurricanes, coastal residence.
+
+- Outcome defined: incidence of diagnosed anxiety/depressive disorders.
+
+- Time frame: assessment at a specific age.
+
+- Population: children of mothers in affected regions.
+
+For causal inference, you would then think about design (e.g., difference‑in‑differences comparing cohorts gestating before/after versus during hurricane, controlling for confounders like SES, maternal mental health).
+
+*SES means socioeconomic status is a composite indicator of a person’s or family’s social and economic position, typically captured with variables such as:*
+
+- *Income (household or individual)*
+
+- *Education level*
+
+- *Occupation or employment status*
+
+- *Sometimes neighborhood characteristics or wealth*
+
+*In the above example, SES would be used as a confounder because families with different socioeconomic status may both:*
+
+ - *Be differentially exposed to severe hurricanes (e.g., living in more vulnerable housing or areas), and*
+
+- *Have different baseline risks for children’s psychological outcomes (through access to health care, stress levels, nutrition, etc.).*
+  
+  **- Are dogs the best pets?**
+  
+Is it a good research question?
+
+No, as written this is not a good empirical research question. It’s vague, value‑laden, and lacks defined constructs. “Best” is a subjective judgment and “pets” is a large, heterogeneous category.  
+
+Problems:
+
+- Ambiguous outcome: “best” could mean satisfaction, health benefits, ease of care, cost, emotional attachment, etc.
+
+- No specified population (children, older adults, urban households, people with allergies, etc.).
+
+- No comparison structure: which other pets (cats, fish, reptiles, “all others”)?
+
+- Strong normative tone rather than a neutral, testable question.
+
+How to make it better:
+
+One way is to convert it into a comparative, well‑defined question with measurable outcomes:
+
+- “Do adult pet owners who keep dogs report higher life satisfaction than those who keep cats?”
+
+- “Are rates of daily physical activity higher among dog owners than among owners of other companion animals?”
+
+- “Do households with dogs incur higher monthly pet‑related expenses than households with cats?”
+
+These evised questions:
+
+- Define outcome: life satisfaction, physical activity, expenses.
+
+- Specify population: adult pet owners, households.
+
+- Describe comparison: dogs vs. cats vs. other pets.
+
+It could also be framed more explicitly as multi‑criteria evaluation:
+
+“How do dog, cat, and small‑animal ownership compare in terms of owner satisfaction, time investment, and annual cost among urban adults?”
+
+That keeps the comparative flavor without asserting “best” up front and supports multi‑dimensional analysis.
+  
+  **- Do organic labels in grocery store items increase sales of those items?**
+
+Is it a good research question?
+
+Yes, this is close to a good causal research question. It’s concise, clearly causal, and focuses on a measurable outcome (sales) and a specific intervention (organic labels).
+
+Strengths:
+
+- Clear causal framing: organic labels → change in sales volume or revenue.
+
+- Variables are measurable: presence of organic label, sales data.
+
+- Direct relevance to marketing, consumer behavior, and retail practice.
+
+Limitations:
+
+- “Organic labels” is not fully specified (certification body, design, placement, whether price changes accompany the label).
+
+- “Sales” needs clarification: units sold, revenue, market share, basket penetration, time window.
+
+- Population/context is missing: specific product categories, stores, regions, or online vs. brick‑and‑mortar.
+
+How to make it better:
+
+Tighten the scope and measurement:
+
+“Does adding certified organic labels to private‑label packaged food products in supermarket chains increase unit sales over the subsequent six months compared to similar non‑labeled products?”
+
+Or, for an experimental design:
+
+“In a controlled online grocery experiment, does displaying an organic certification logo on a product image increase the probability of purchase compared to the same product without the logo?”
+
+These versions:
+
+- Specify context: supermarket chains or online grocery.
+
+- Define exposure: adding certified organic labels/logo.
+
+- Define outcome: unit sales or purchase probability in a defined period.
+
+- Allow clear identification and appropriate causal design (e.g., A/B test, difference‑in‑differences using label introduction timing).
+
+**For defining a good research question, a usful pattern would be:**
+
+**“Does [specific exposure or intervention] lead to [specific, measurable outcome] in [defined population] over [defined time frame]?”**
+
+- **fits this pattern with more operational precision.**
+
+- **needs transformation from “best” into specific comparative outcomes.**
+
+- **already follows the pattern and mainly needs tighter definitions and context.**
+
+3.  Think about a possible research question in your field of study (e.g., your major).
+
+    a.  Can this question be answered? Is it feasible to answer it?
+
+    b.  Does the question answer something about how the world works? If so, how?
+
+    c.  Write down some hypotheses based on the question.
+
+    d.  What kind of data needs to be collected to test the hypothesis?
+
+4.  For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?).
+
+    a.  Theory:
+
         - People donate to political campaigns largely because they want to defeat a political opponent, not because they like the candidate they’re donating to.
-    
-        Research question: 
+
+        Research question:
+
         - Do negative advertisements increase political campaign donations in US Congressional races more than positive advertisements do?
-    
-    b. Theory: 
+
+    b.  Theory:
+
         - men have higher average salaries than women in the US partially because employers discriminate against women in job interviews
-    
-        Research question: 
+
+        Research question:
+
         - Does the use of a gender-blind interview process, where hiring decisions and salary offers are made without knowing the employee’s gender, shrink the salary gap between men and women?
-        
-    
-    c. Theory: 
+
+    c.  Theory:
+
         - Living in a rich country improves happiness.
-    
-        Research question: 
+
+        Research question:
+
         - Do people who live in richer countries on average report higher happiness levels?
-        
-    
-    d. Theory: 
+
+    d.  Theory:
+
         - Many plants survive without eating because they collect energy from sunlight.
 
-        Research question: 
+        Research question:
+
         - Are plants that live underneath a thick canopy (where little light can get through) less healthy than those in a loose canopy?
-    
-
-
