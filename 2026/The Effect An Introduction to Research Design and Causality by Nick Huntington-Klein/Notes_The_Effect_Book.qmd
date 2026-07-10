@@ -106,6 +106,80 @@ Why is it so important for research to be properly designed? One way we can thin
 
 **Part II** turns to the methods toolbox: it presents standard causal inference techniques for using observational data when you cannot run an experiment. These methods are widely used because they work in many applied settings and rest on assumptions that are now well studied and relatively well understood.
 
+# **Chapter 2 - Research Questions**
+
+## **2.1 What Is a Research Question?**
+
+Coming up with a question is easy. Coming up with a good research question is much harder.
+
+What’s the difference? The difference, at least in the case of quantitative empirical research, is that a research question is a question **that can be answered**, and for which having that answer will **improve your understanding of how the world works.**
+
+What does it mean to have a question that can be answered? It means that it’s possible for there to be some set of evidence in the world that, if you found that evidence, your question would have a believable answer.
+
+So we have a question that can be answered. But does it improve our understanding of how the world works? What this means is that the research question, once answered, should tell you about something broader than itself. It should inform theory in some way. Theory doesn’t have to be something as important as the theory of gravity or the theory of evolution. It could even be something as generic as “bread costs more today than last year because bread prices have been generally increasing over time.” Theory just means that there’s a why or a because lurking around somewhere. Even hydrogen is a theory - it says that we see material like water behaving a certain way because there’s a kind of atom that behaves in certain ways and has a certain structure.
+
+**Theory** - An explanation of why the things we observe happen, or otherwise generalizes what we observe in one situation to another situation.
+
+A good research question takes us from theory to hypothesis, where a hypothesis is a specific statement about what we will observe in the world, like “people who wash their hands will get sick less often.”
+
+**Hypothesis** - A specific statement about what you will observe in the data.
+
+## **2.2 Why Start with a Question?**
+
+There’s data everywhere. So why not skip the hard part of deriving a research question from a theory and instead just see what sorts of patterns are in the data?
+
+This is called “data mining”.
+
+The kinds of things that data mining is good at are in finding patterns and in making predictions under stability. The kinds of things that data mining is less good at are in improving our understanding, or in other words helping improve theory. It also has a tendency to find false positives if you aren’t careful. 
+
+*What do I mean by “under stability”? I mean that the process giving us the data doesn’t change. If I roll a six-sided die a thousand times, data mining would be great at predicting that the probability of a 1 is. But if I then switch to a twenty-sided die, that data mining prediction will be bad. It will still predict a chance of a 1 until it gets a lot more data. Probability theory, on the other hand, will properly predict the switch to a chance immediately.*
+
+Sometimes seeing patterns in data can give us ideas for research questions that we can examine further in other data sources.
+
+It’s also probably the best angle to take when we don’t care about why! If I don’t care why the stock market goes up or down, and I just want to predict if it will or not so that I know whether to buy or sell, then data mining may well be the way to go.
+
+There are ways of avoiding false positives while doing data mining - this is something they worry about a lot in data science and have a lot of tools for.
+
+*Some examples are “cross-validation” and “training and testing sets.”*
+
+That said, data mining isn’t all bad. There’s no way we could possibly think up every interesting theory to test. Plenty of theories come from looking at the data in the first place, noticing a pattern, and wondering why the pattern is showing up, or whether the pattern is even real.
+
+Of course, the responsible thing to do at that point is to not just take the pattern as given. That’s where the real problem of data mining is. Instead, take the interesting pattern noticed and look to see if it holds up in other data - if it replicated - before being sure that the pattern noticed is real and explains how what you saw worked (Viagra example).
+
+## **2.3 Where Do Research Questions Come From?**
+
+Research questions can come from lots of places. Mostly, curiosity.
+
+- theory –> hypothesis –> question
+
+- data –> opportunity –> question
+
+## **2.4 How Do You Know if You’ve Got a Good One?**
+
+- Consider Potential Results - If you can’t say something interesting about your potential results, that probably means your research question and your theory aren’t as closely linked as you think.
+
+- Consider Feasibility - A research question should be a question that can be answered using the right data, if the right data is available. But is the right data available?
+
+- Consider Scale - What kind of resources and time can you dedicate to answering the research question?
+
+- Consider Design - A research question can be great on its own, but it can only be so interesting without an answer.
+
+- Keep It Simple! - Answering any research question can be difficult. Don’t make it even harder on yourself by biting off more than you can chew! A common mistake is to bundle a bunch of research questions into one.
+
+So, consider feasibility, scale, and design. Keep it simple, and think about whether the results you might likely see would tell you anything interesting about the world. After all, learning something interesting and new about the world is our goal!
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### **Homework for Chapter 2: Research Questions**
 
 **1. What is data mining useful for? What are its limitations?**
