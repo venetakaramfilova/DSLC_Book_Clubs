@@ -282,7 +282,7 @@ ggplot(
 6.  What does the `na.rm` argument do in [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to `TRUE`.
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | `na.rm` | If `FALSE`, the default, missing values are removed with a warning. If `TRUE`, missing values are silently removed. |
 
 ```{r}
@@ -355,7 +355,7 @@ ggplot(
 9.  Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | `se` | Display confidence band around smooth? (`TRUE` by default, see `level` to control.) |
 
 ```{r}
@@ -1024,7 +1024,7 @@ ggplot(
 ) +
   geom_point()
 
-ggsave(filename = "penguin-plot.png")
+ggsave(filename = "1_penguin-plot.png")
 ```
 
 ### **Exercises**
@@ -1050,7 +1050,7 @@ ggplot(
 ) +
   geom_point()
 
-ggsave("mpg-plot.png")
+ggsave("1_mpg-plot.png")
 ```
 
 2.  What do you need to change in the code above to save the plot as a PDF instead of a PNG? How could you find out what types of image files would work in [`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)?
@@ -1072,5 +1072,5 @@ ggplot(
 ) +
   geom_point()
 
-ggsave("mpg-plot.pdf")
+ggsave("1_mpg-plot.pdf")
 ```

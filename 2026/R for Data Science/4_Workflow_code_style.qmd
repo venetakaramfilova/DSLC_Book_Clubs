@@ -204,7 +204,7 @@ arr_delay,na.rm=TRUE),cancelled=sum(is.na(arr_delay)),n=n())|>filter(n>10)
 ```{r}
 
 style_file(
-  "C:/Users/user/R/DSLC_Book_Clubs/2026/R for Data Science by Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund/4_Workflow_code_style_exercise.qmd",
+  "C:/Users/user/R/DSLC_Book_Clubs/2026/R for Data Science/4_Workflow_code_style_exercise.qmd",
   style = tidyverse_style
 )
 ```
