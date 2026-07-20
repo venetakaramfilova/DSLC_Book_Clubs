@@ -46,6 +46,10 @@ ggplot(
 
 ggsave("6_diamonds.png")
 
-write_csv(diamonds, "diamonds.csv")
+write_csv(diamonds, "6_diamonds.csv")
 
 ```
+
+Once you’re inside a project, you should only ever use relative paths not absolute paths. What’s the difference? A relative path is relative to the working directory, i.e. the project’s home. When Hadley wrote `data/diamonds.csv` above it was a shortcut for `/Users/hadley/Documents/r4ds/data/diamonds.csv`. But importantly, if Mine ran this code on her computer, it would point to `/Users/Mine/Documents/r4ds/data/diamonds.csv`. This is why relative paths are important: they’ll work regardless of where the R project folder ends up.
+
+*6_diamonds will be saved in the R project directory - R for Data Science*
