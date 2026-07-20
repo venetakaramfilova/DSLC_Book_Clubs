@@ -1,0 +1,629 @@
+---
+title: "6 Canadian wind turbines: waffle plots and pictograms"
+author: "Veneta Karamfilova"
+format: html
+editor: visual
+---
+
+# **6  Canadian wind turbines: waffle plots and pictograms**
+
+In this chapter, we’ll learn how to read in data from an Excel file via a URL, create waffle plots using the **`waffle`** package, and write a subtitle with colored text to be used as an alternative to a traditional legend.
+
+By the end of this chapter, you’ll be able to:
+
+- Load data from Excel files, including those hosted online;
+
+- Create waffle plots using custom icons; and
+
+- Write your own source text function to keep a consistent style across different charts.
+
+## **Data**
+
+Back in October 2020, data on wind turbines in Canada from the Government of Canada Open Data portal was used as a [TidyTuesday dataset](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-10-27) ([R4DS Online Learning Community 2023](https://nrennie.rbind.io/art-of-viz/references.html#ref-tidytuesday)). The Canadian Wind Turbine Database provides information about wind turbines installed in Canada, including their power capacity and geographic location ([Natural Resources Canada 2021](https://nrennie.rbind.io/art-of-viz/references.html#ref-turbines_data)). Rather than reading in the data using the **`tidytuesdayR`** package as we’ve done in previous chapters, let’s read in the data directly from the [open.canada.ca](https://open.canada.ca/en) website.
+
+```{r}
+
+library(dplyr)
+library(GGally)
+library(ggplot2)
+library(glue)
+library(marquee)
+library(openxlsx)
+library(rcartocolor)
+library(readr)
+library(showtext)
+library(stringr)
+library(sysfonts)
+library(waffle)
+```
+
+```{r}
+#| label: download-data
+#| message: false
+
+base_url <- 
+  "https://ftp.cartes.canada.ca/"
+
+url <- 
+  paste0(
+    base_url,
+    "pub/nrcan_rncan/Wind-energy_Energie-eolienne/wind_turbines_database/Wind_Turbine_Database_FGP.xlsx"
+  )
+
+wind_turbines <- 
+  read.xlsx(xlsxFile = url)
+```
+
+## **Exploration**
+
+```{r}
+
+head(wind_turbines)
+glimpse(wind_turbines)
+```
+
+Let’s start by exploring the hypothesis that wind turbines with a larger rotor diameter also have a higher capacity. We can make a scatter plot of these two variables as an initial step. The `Turbine.rated.capacity.(kW)` column is currently a character column even though it contains numeric values, so we wrap the column in [`as.numeric()`](https://rdrr.io/r/base/numeric.html) before plotting it:
+
+```{r}
+
+ggplot(
+  wind_turbines,
+  aes(
+    `Rotor.Diameter.(m)`, 
+    as.numeric(`Turbine.Rated.Capacity.(kW)`)
+  )
+) +
+  geom_point() +
+  theme_minimal() +
+  labs(
+    x = "Rotor diameter (m)",
+    y = "Turbine rated capacity (kW)"
+  ) 
+
+```
+
+In addition to looking at the data, obtaining summaries of the columns, and creating exploratory graphics with base R, there are many packages available to help with exploratory data analysis.
+
+For example, the **`GGally`** package ([Schloerke et al. 2024](https://nrennie.rbind.io/art-of-viz/references.html#ref-GGally)) makes it easy to create pairwise comparison plots and correlation matrices for the purposes of exploring some or all columns in your data.
+
+```{r}
+
+ggpairs(
+  data = wind_turbines,
+  columns = c(
+    "Province_Territory",
+    "Hub.Height.(m)",
+    "Rotor.Diameter.(m)"
+  ), 
+  cardinality_threshold = 61 # not in book; otherwise error; looks weird
+)
+```
+
+- `FUN = length` counts occurrences per province level
+
+```{r}
+
+ggplot(
+  wind_turbines, 
+  aes(
+    reorder(Province_Territory, Province_Territory, FUN = length)
+  )
+) +
+  geom_bar() +
+  coord_flip() +
+  theme_minimal() +
+  labs(
+    title = "Number of wind turbines in each region",
+    x = "",
+    y = ""
+  ) 
+
+```
+
+Most of the turbines are located in Ontario, but has this always been the case? We also have information on the commissioning date of each turbine. 
+
+```{r}
+
+ggplot(
+  wind_turbines, 
+  aes(
+    reorder(Province_Territory, Province_Territory, FUN = length)
+  )
+) +
+  geom_bar() +
+  coord_flip() +
+  facet_wrap(~ Commissioning) +
+  theme_minimal() +
+  labs(
+    title = "Number of wind turbines in each region by commissioning date",
+    x = "",
+    y = ""
+  ) 
+
+```
+
+There are some years for which we have very few observations, and some turbines for which we don’t know the exact year of the commissioning date. Rather than plotting the number of turbines per year, let’s plot the number of turbines in different multiyear time periods. The choice of these time periods is open to designer choice. For this visualization, let’s start by considering four, 5-year time periods: 2000 - 2004, 2005 - 2009, 2010 - 2014, and 2015 - 2019.
+
+We have 7841 observations to plot which is a lot of individual grid squares. Instead, each square may represent some number of turbines, rather than just one.
+
+Instead of plotting squares, we could use icons. For example, we could plot an icon of a wind turbine. This variation of a waffle chart can be referred to as a *pictogram*. The icons can be colored based on the region in the `Province/Territory` column. Instead of using a traditional legend that takes up lots of space, we could use colored text within the subtitle as an alternative.
+
+## **Data wrangling**
+
+There are three types of values in the `Commissioning.date` column.
+
+- Single year e.g. `"2019"`: this is the ideal scenario and we don’t need to do anything.
+
+- Two years separated by a `/` e.g. `"2001/2003"`: there are several options for dealing with this. We could either take the first year, the last year, or (if they are non-consecutive years) a mid-point of the year range. Here, we’ll take the last year since this means that all wind turbines with that `Commissioning.date` will definitely have been commissioned by that date.
+
+- Three years separated by a `"/"` e.g. `"2005/2006/2012"`: this is more again more complex, but we’ll take the last year for the same reasons as above.
+
+Essentially, this means that:
+
+- If there is no `"/"` in the `Commissioning.date`, we do nothing.
+
+- If there is one or more `"/"` in the `Commissioning.date`, we extract whatever comes after the last one.
+
+Let’s make a function that does exactly that, called `extract_after_last_slash()`. The input this function is a vector of character strings. We start by checking which elements of the input contain a `"/"` using [`str_detect()`](https://stringr.tidyverse.org/reference/str_detect.html) from the **`stringr`** package ([Wickham 2023b](https://nrennie.rbind.io/art-of-viz/references.html#ref-stringr)). We then use [`str_match()`](https://stringr.tidyverse.org/reference/str_match.html) from **`stringr`** in combination with a regular expression to extract the element after the last `"/"`. If there is no `"/"`, the output will be `NA`. The [`str_match()`](https://stringr.tidyverse.org/reference/str_match.html) function returns a matrix with the same number of rows as the length of the input, where the first column is the complete match i.e. the input. The second column contains the output we want so we use `[, 2]` to extract it. Finally, we use [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html) from **`dplyr`**, to if there was a `"/"` then use the output from [`str_match()`](https://stringr.tidyverse.org/reference/str_match.html), otherwise keep the original value.
+
+```{r}
+
+extract_after_last_slash <- 
+  function(texts) {
+    has_slash <- str_detect(texts, "/")
+    extracted <- str_match(texts, ".*/(.*)$")[, 2]
+    output <- if_else(has_slash, extracted, texts)
+    return(output)
+  }
+
+```
+
+W
+
+```{r}
+
+turbines_year <- 
+  wind_turbines |>
+  select(
+    `Province_Territory`, Commissioning
+  ) |>
+  mutate(
+    Year = extract_after_last_slash(Commissioning),
+    Year = as.numeric(Year)
+  )
+
+```
+
+```{r}
+
+ggplot(
+  turbines_year, 
+  aes(
+    reorder(Province_Territory, Province_Territory, FUN = length)
+  )
+) +
+  geom_bar() +
+  coord_flip() +
+  facet_wrap(~ Year) +
+  theme_minimal() +
+  labs(
+    title = "Number of wind turbines in each region by commissioning date",
+    x = "",
+    y = ""
+  ) 
+```
+
+Now let’s group the new `Year` column into categories.
+
+We use [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html) from **`dplyr`** to actually construct the categories. Here, we make use of the [`seq()`](https://rdrr.io/r/base/seq.html) function. The `seq(2000, 2004)` code creates a vector `2000 2001 2002 2003 2004`. If any the `Year` is equal to any of those values, then it goes into the `"2000 - 2004"` category. And so on. 
+
+Although R will automatically sort the year categories in the correct order since, in this case, the alphabetical order happens to match the desired order. However, it’s good practice to be explicit about what order the categories should have, so we can also set `Year_Group` to be a factor and specify the correct order.
+
+```{r}
+
+turbines_year_group <- 
+  turbines_year |>
+  filter(Year >= 2000 & Year <= 2024) |>
+  mutate(
+    Year_Group = case_when(
+      Year %in% seq(2000, 2004) ~ "2000 - 2004",
+      Year %in% seq(2005, 2009) ~ "2005 - 2009",
+      Year %in% seq(2010, 2014) ~ "2010 - 2014",
+      Year %in% seq(2015, 2019) ~ "2015 - 2019", 
+      Year %in% seq(2020, 2024) ~ "2020 - 2024"
+    )
+  ) |>
+  mutate(
+    Year_Group = factor(
+      Year_Group, 
+      levels = c(
+        "2000 - 2004", 
+        "2005 - 2009",
+        "2010 - 2014", 
+        "2015 - 2019",
+        "2020 - 2024"
+      )
+    )
+  )
+```
+
+Let’s look at the Province/Territory categories. Using count() and arrange() from dplyr, shows us that there is a big imbalance between the categories:
+
+```{r}
+
+turbines_year_group |>
+  count(`Province_Territory`) |>
+  arrange(-n)
+```
+
+We use [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) and [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html) again, to change the value in `Region` to `"other"` when the region is one of the six specified values.
+
+Then, we count up how many turbines were commissioned in each `Year_Group` and `Region` combination using [`count()`](https://dplyr.tidyverse.org/reference/count.html). We also need to decide how many turbines each icon will represent.
+
+Here, we used `20`. This means we divide the turbine count by `20` to obtain the number of icons required, rounding the values as we can only have whole icons.
+
+We filter out any rows where the rounded count is `0` since these won’t be plotted. As an aside, it’s important to think about these values before we simply throw them away. For example, a region which had 9 turbines in a particular time period won’t show up on this plot - since `9/20` is less than 0.5 and so is rounded to `0`. This is an unfortunate limitation of this type of waffle plot variation.
+
+```{r}
+
+turbines_region <- 
+  turbines_year_group |>
+  rename(Region = `Province_Territory`) |>
+  mutate(
+    Region = case_when(
+      Region %in% c(
+        "Northwest Territories",
+        "Newfoundland and Labrador",
+        "Prince Edward Island",
+        "New Brunswick",
+        "Manitoba",
+        "Saskatchewan"
+      ) ~ "Other",
+      TRUE ~ Region
+    )
+  ) |>
+  count(Region, Year_Group) |>
+  mutate(n = round(n / 20)) |>
+  filter(n != 0)
+```
+
+The `Region` variable will be plotted alphabetically be default, but this is rarely the most useful ordering. Instead, let’s order by magnitude - with the exception of putting the `"other"` category last.
+
+We start by using the [`summarise()`](https://dplyr.tidyverse.org/reference/summarise.html) function to add up the number of turbines across the different time periods, getting a total per `Region`. We then [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) them in a descending order (note the `-` in front of the `n`). We then [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) out the `"other"` category and stick it on the end after extracting the `Region` column using [`pull()`](https://dplyr.tidyverse.org/reference/pull.html).
+
+```{r}
+
+region_levels <- 
+  c(
+    turbines_region |>
+    summarise(n = sum(n), .by = Region) |>
+    arrange(-n) |>
+    filter(Region != "Other") |>
+    pull(Region), 
+    "Other"
+  )
+```
+
+Now, let’s apply these new factor levels to the `Region` column using [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html). Due to a *quirk* of the **`waffle`** package ([Rudis and Gandy 2023](https://nrennie.rbind.io/art-of-viz/references.html#ref-waffle)) that we’ll be using to make our plot (it plots data in the order it appears in the dataset, rather than according to the factor levels), we also sort the data using [`arrange()`](https://dplyr.tidyverse.org/reference/arrange.html) from **`dplyr`**.
+
+```{r}
+
+plot_data <- 
+  turbines_region |>
+  mutate(
+    Region = factor(Region, levels = region_levels)
+  ) |>
+  arrange(Region)
+```
+
+## **Installing Font Awesome fonts**
+
+Before we jump into plotting, we need to do one more thing. We decided we would use icons in the waffle chart instead of just colored grid squares. So we need to find a way of using icons in R.
+
+[Font Awesome](https://fontawesome.com/) is a popular icon toolkit that provides scalable vector icons and social logos
+
+```{r}
+
+font_add(
+  family = "Font Awesome 7",
+  regular = "C:/Users/user/R/Book Clubs/2026/1_The Art of Data Visualization with ggplot2/6_fontawesome-free-7.2.0-desktop/otfs/Font Awesome 7 Free-Solid-900.otf"
+)
+showtext_auto()
+showtext_opts(dpi = 300)
+```
+
+## The first plot with waffle
+
+Though the package includes the [`waffle()`](https://rdrr.io/pkg/waffle/man/waffle.html) function which allows you to create a waffle chart directly from a `data.frame`, it also include `geom` functions to allow you to build charts in the way you normally would with **`ggplot2`**. The [`geom_waffle()`](https://rdrr.io/pkg/waffle/man/geom_waffle.html) function can be used to build traditional waffle charts with grid squares, and the [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) function is used for waffle charts with icons i.e. pictograms. 
+
+We then edit the aesthetic mapping in the [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) function, where we specify the `label` and `color` - both mapped to the `Region` column. This might seem slightly unusual because we don’t want the icon to vary with region. Instead, we want to use the same icon for all categories. However, [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) expects `label` to vary by category, so we map it to region and we’ll later use [`scale_label_pictogram()`](https://rdrr.io/pkg/waffle/man/scale_label_pictogram.html) to make them all the same icon. The `values` argument is also a required aesthetic. We use the `n` column in the data to specify how many icons should be plotted for each category. The x and y coordinates are automatically calculated when we use the [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) function so we don’t need to map these out in the [`aes()`](https://ggplot2.tidyverse.org/reference/aes.html) function.
+
+We also edit a few other parameters of the [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) function. By default, pictograms are stacked horizontally as this is often easier to read (similar to horizontal bar charts). However, it’s also very common to put date variables on the x-axis. Setting `flip = TRUE` will stack the pictogram categories upwards, and allow the date categories to go on the x-axis. Setting `n_rows = 10` means that each row of the pictogram will contain 10 icons (remember that we’ve flipped rows and columns here). We can edit the `size` of the icons in the same way we would edit the font size in [`geom_text()`](https://ggplot2.tidyverse.org/reference/geom_text.html), for example.
+
+By default, [`geom_pictogram()`](https://rdrr.io/pkg/waffle/man/geom_pictogram.html) and [`geom_waffle()`](https://rdrr.io/pkg/waffle/man/geom_waffle.html) both assume that the column mapped to `values` should be plotted as counts. If you’d prefer to plot the values as percentages, set `make_proportional = TRUE`.
+
+```{r}
+
+basic_plot <- 
+  ggplot(data = plot_data) +
+    geom_pictogram(
+      mapping = aes(
+        label = Region,
+        color = Region,
+        values = n
+      ),
+      flip = TRUE,
+      n_rows = 10,
+      size = 2.5,
+      family = "Font Awesome 7"
+    ) +
+    facet_wrap(
+      ~ Year_Group,
+      nrow = 1,
+      strip.position = "bottom"
+    )
+
+basic_plot
+```
+
+What you might immediately notice about [Figure 6.6](https://nrennie.rbind.io/art-of-viz/wind-turbines.html#fig-turbines-base-plot) is that there are no icons. Instead, the plot has printed the `Region` names (even though we’ve set `family = "Font Awesome 6"`). This is because we haven’t defined which icons we want to use. To find an appropriate icon and what it’s called, we can browse the Font Awesome website at [fontawesome.com/search](https://fontawesome.com/search) and search for related icons.
+
+We can add [`scale_label_pictogram()`](https://rdrr.io/pkg/waffle/man/scale_label_pictogram.html) from **`waffle`** to our plot to specify the icons. We would normally pass in a vector of icon names to the `values` argument - one icon for each category. However, since we want to use the same icon for all categories, we can simply pass in a single name - taking advantage of the fact that R re-uses elements of vectors. 
+
+```{r}
+
+icons_plot <- 
+  basic_plot +
+    scale_label_pictogram(
+      values = "fan",
+      guide = "none"
+    )
+
+icons_plot
+```
+
+### **Colors with `rcartocolo`**
+
+```{r}
+
+bg_col <- "#FAFAFA"
+text_col <- "black"
+```
+
+In the **`rcartocolor`** package, categorical palettes are referred to as *qualitative* palettes. We can see all available qualitative palettes with a sufficient number of colors using [`display_carto_all()`](https://rdrr.io/pkg/rcartocolor/man/display_carto_all.html):
+
+```{r}
+
+display_carto_all(
+  n = 6, type = "qualitative"
+)
+```
+
+Although the **`rcartocolor`** package has the [`scale_fill_carto_d()`](https://rdrr.io/pkg/rcartocolor/man/carto_scale.html) function which we could use directly in our plots, we’ll still save the color palette as a vector of hex codes to allow us to reuse the colors more easily. As you can see in the output, in the qualitative palettes in the **`rcartocolor`** package, the last color is often gray. That’s a great choice for representing missing data, but when we want different colors for categories it doesn’t work as well. The trick is to ask for one more color than we need, and then throw away the last element in the color palette. We have 6 categories in our plot, so we ask for 7 colors using the [`carto_pal()`](https://rdrr.io/pkg/rcartocolor/man/carto_pal.html) function and then extract only the first 6. We’ll use the `"Vivid"` palette here.
+
+We also make the `col_palette` vector a named vector by using the [`names()`](https://rdrr.io/r/base/names.html) function, and using `region_levels` as the names. Although this isn’t necessary for adding the colors to the plot, it will make it easier to extract the colors and ensure each color is mapped to the correct category label.
+
+```{r}
+
+# I like better the Pastel palette :)
+col_palette <- 
+  carto_pal(
+    n = length(unique(plot_data$Region)) + 1,
+    name = "Pastel"
+  )[1:length(unique(plot_data$Region))]
+
+names(col_palette) <- region_levels
+```
+
+We can then pass this `col_palette` vector into [`scale_color_manual()`](https://ggplot2.tidyverse.org/reference/scale_manual.html) to apply the colors to our plot. Since we’ll be using colored text instead of a traditional legend, we set `guide = "none"` to remove the legend again.
+
+```{r}
+
+col_plot <- 
+  icons_plot +
+  scale_color_manual(
+    values = col_palette,
+    guide = "none"
+  )
+```
+
+### **Adding styled text with `marquee`**
+
+We’ve already seen in [Chapter 2](https://nrennie.rbind.io/art-of-viz/programming-languages.html) and [Chapter 3](https://nrennie.rbind.io/art-of-viz/museums.html) how to format the title or subtitle text to be bold using the `face = "bold"` argument inside [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) elements. But what if we want to make only *part* of the text bold? We can use the **`marquee`** package ([Pedersen and Mitáš 2024](https://nrennie.rbind.io/art-of-viz/references.html#ref-marquee)) to add styling to text within a string. The **`marquee`** package allows you to use Markdown syntax in text when you’re making graphics in R, including in plots built with **`ggplot2`** or other graphics built with **`grid`**.
+
+In Markdown, to make text bold, you enclose it inside two pairs of asterisks, e.g., `**bold text**`. For example, if we wanted to put the entire title in bold font, we could write the title inside `**`. In the caption, we might want to **embolden** the words `Data` and `Graphic` to highlight that there are two different fields of information:
+
+```{r}
+
+title <- 
+  "**Ontario is the province with the most wind turbines**"
+
+cap <- 
+  "**Data**: Natural Resources Canada | **Graphic**: N. Rennie"
+```
+
+This type of formatting for the plot caption is something that we might like to reuse across multiple plots. And when we want to reuse code, it’s almost always useful to make it into a function. Let’s define a function called `source_caption()` which has three arguments:
+
+- `source`: a character string for the source of the data
+
+- `graphic`: a character string for the attribution of the visualization
+
+- `sep`: a character string for what should separate the two pieces of text, which has `" | "` as a default.
+
+We then use [`glue()`](https://glue.tidyverse.org/reference/glue.html) from **`glue`** to stick these three arguments together, and include the bold formatting using `**`. Here we use namespacing (prefixing the function name with the package name and `::`) to make it easier to reuse this function in later chapters.
+
+```{r}
+
+source_caption <- 
+  function(source, graphic, sep = " | ") {
+    caption <- glue::glue(
+      "**Data**: {source}{sep}**Graphic**: {graphic}"
+    )
+    return(caption)
+  }
+```
+
+Let’s move onto the subtitle. In this visualization, the subtitle will also be doubling as a legend as we’ll use colored text to denote the different categories. In **`marquee`**, text can be colored by wrapping the text in curly brackets, where the first word is pre-fixed by a period and identifies the color of the text, i.e., `{.color text to color}`, for example, `{.red This is red text.}`.
+
+We want to add the colors and the text to be colored in a programmatic way. We’ll use square brackets to subset the values and names stored in the `col_palette` vector. Here, `col_palette[[1]]` extracts the hex code for the color of the first category, and `names(col_palette)[[1]]` extracts the name of the first category.
+
+Normally, when we want to write character strings and insert variables into the string, we’d use [`glue()`](https://glue.tidyverse.org/reference/glue.html) to combine them. However, the [`{}`](https://rdrr.io/r/base/Paren.html) that we normally use for variables in [`glue()`](https://glue.tidyverse.org/reference/glue.html) will get mixed up with the [`{}`](https://rdrr.io/r/base/Paren.html) we’ll use for text formatting with **`marquee`**. There are a couple of different ways we can get around this problem. One way is changing the delimiters used in [`glue()`](https://glue.tidyverse.org/reference/glue.html). For example, by setting `.open = "["` and `.close = "]"` inside the [`glue()`](https://glue.tidyverse.org/reference/glue.html) function. Alternatively, we can use [`marquee_glue()`](https://marquee.r-lib.org/reference/marquee_glue.html) from the **`marquee`** package - an equivalent version of [`glue()`](https://glue.tidyverse.org/reference/glue.html) that was built to deal with this problem.
+
+```{r}
+
+st <- 
+  marquee_glue(
+  "The Canadian Wind Turbine Database contains the geographic location and key technology details for wind turbines installed in Canada. It includes information about turbines installed in {.{col_palette[[1]]} {names(col_palette)[[1]]}}, {.{col_palette[[2]]} {names(col_palette)[[2]]}}, {.{col_palette[[3]]} {names(col_palette)[[3]]}}, {.{col_palette[[4]]} {names(col_palette)[[4]]}}, {.{col_palette[[5]]} {names(col_palette)[[5]]}}, and {.{col_palette[[6]]} {names(col_palette)[[6]]}} regions."
+  )
+```
+
+Add these text elements to our plot in the normal way, by passing them into the [`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) function. You’ll notice in [Figure 6.9](https://nrennie.rbind.io/art-of-viz/wind-turbines.html#fig-turbines-text-plot) that the formatting hasn’t been applied, and that the `**` have been rendered literally. We’ll deal with this when we edit the arguments in [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) - we haven’t actually used **`marquee`** yet to format the title text
+
+```{r}
+
+text_plot <- 
+  col_plot +
+    labs(
+      title = title,
+      subtitle = st,
+      caption = cap
+    )
+
+text_plot
+```
+
+### **Adjusting scales and themes**
+
+We can make a final few tweaks to our plot, to apply the formatting with **`marquee`** and make it look a little bit cleaner. Let’s start by adjusting the scales. At the moment, the y-axis ranges from 0 to around 15. We know this isn’t correct because we have over 6,500 observations in our data. There are two reasons why the scale of the y-axis is incorrect:
+
+- Each icon represents 20 turbines, so the y-axis labels are currently showing as 20 times smaller than they should be.
+
+- Within each facet, a row contains 10 icons, so the y-axis labels are currently showing as another 10 times smaller than they should be.
+
+Let’s fix that by passing a function into the `labels` argument of [`scale_y_continuous()`](https://ggplot2.tidyverse.org/reference/scale_continuous.html). The function takes the existing y-axis label, multiplies it by `10`, multiplies it by `20`, and formats it using a thousand separator comma. We set `expand = c(0, 0)` to remove the extra space at the top and bottom of the y-axis. Let’s also choose slightly nicer break points for the y-axis - ranging from 0 to 4,000 with breaks every 1,000. Unfortunately, we need to specify the limits and the breaks on the original scale rather than on the label scale, e.g., a break point of `15` is actually a break point of `15 * 20 * 10 = 3000`. Adding [`coord_fixed()`](https://ggplot2.tidyverse.org/reference/coord_fixed.html) helps to deal with the overlapping icons issue, by making each icon area square.
+
+```{r}
+
+scale_plot <- 
+  text_plot +
+    scale_y_continuous(
+      labels = function(x) {
+        format(
+          x * 10 * 20,
+          big.mark = ","
+        )
+      },
+      expand = c(0, 0),
+      breaks = c(0, 5, 10, 15, 20),
+      limits = c(0, 20)
+    ) +
+    coord_fixed()
+```
+
+Let’s make a few final edits to tidy up our plot by editing the theme. We’ll use [`theme_minimal()`](https://ggplot2.tidyverse.org/reference/ggtheme.html) as a base theme (making the font size a little bit smaller), and then make a few further edits using the [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) arguments.
+
+Within [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html), we start by setting `plot.title.position` and `plot.caption.position` to `"plot"` to align the title, subtitle, and caption text with the edge of the whole plot, rather than the start of the first panel. Some additional spacing around the edge of the plot is added using `plot.margin` and the background color is edited by using the `fill` and `color` arguments in [`element_rect()`](https://ggplot2.tidyverse.org/reference/element.html) for the `plot.background` argument. The gridlines are also made slightly thinner by adjusting `panel.grid.major`.
+
+Finally, we edit the plot, subtitle, and caption elements and specify them all using [`element_marquee()`](https://marquee.r-lib.org/reference/element_marquee.html). By using [`element_marquee()`](https://marquee.r-lib.org/reference/element_marquee.html), the Markdown syntax we’ve applied, such as the bold and colored text, will be rendered correctly. You can adjust the `color`, `size`, `margin` and `hjust` of **`marquee`** text in the same way you would with [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html). If you have some elements of the text rendered with [`element_text()`](https://ggplot2.tidyverse.org/reference/element.html) and some rendered with [`element_marquee()`](https://marquee.r-lib.org/reference/element_marquee.html), you may notice some differences in the text sizing and spacing. Try setting the size of individual elements with the `size` argument.
+
+The `width` argument applies text wrapping, where `width = 1` means the text wraps to the full width of the plot. This is similar to the way that `element_textbox_simple()` from **`ggtext`** works. However, the `width` is not set by default, so if you want the text to wrap it’s important to specify the width.
+
+```{r}
+
+scale_plot +
+  theme_minimal(
+    base_size = 7.5
+  ) +
+  theme(
+    # spacing around text and plot
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    plot.margin = margin(5, 10, 5, 10),
+    # background and grid lines
+    plot.background = element_rect(
+      fill = bg_col, color = bg_col
+    ),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(
+      linewidth = 0.4
+    ),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_blank(),
+    # format text with marquee
+    plot.title = element_marquee(
+      color = text_col,
+      width = 1,
+      size = 12
+    ),
+    plot.subtitle = element_marquee(
+      color = text_col,
+      width = 1,
+      size = 9
+    ),
+    plot.caption = element_marquee(
+      hjust = 0,
+      lineheight = 0.5,
+      size = 8,
+      margin = margin(t = 5)
+    )
+  )
+```
+
+Save file
+
+```{r}
+
+ggsave(
+  filename = "wind-turbines.png",
+  width = 5,
+  height = 0.75 * 5
+)
+```
+
+## **Exercises**
+
+1.  Instead of using the icons to represent the number of turbines, recreate this visualization where the icons represent the total capacity (kW). Should you choose a different icon?
+
+2.  Can you arrange both versions (number and capacity) as a single visualization? Hint: you might want to use the **`patchwork`** package discussed in [Chapter 12](https://nrennie.rbind.io/art-of-viz/time-zones.html).
+
+```{r}
+# calendar-plus looks like a battery
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

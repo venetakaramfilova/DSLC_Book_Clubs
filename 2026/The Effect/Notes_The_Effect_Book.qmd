@@ -4,6 +4,14 @@ format: pdf
 editor: visual
 ---
 
+```{r}
+#| echo: false
+#| message: false
+
+library(tidyverse)
+
+```
+
 # **Chapter 1 - Designing Research**
 
 ## **1.1 I Have a Question**
@@ -130,7 +138,7 @@ There’s data everywhere. So why not skip the hard part of deriving a research 
 
 This is called “data mining”.
 
-The kinds of things that data mining is good at are in finding patterns and in making predictions under stability. The kinds of things that data mining is less good at are in improving our understanding, or in other words helping improve theory. It also has a tendency to find false positives if you aren’t careful. 
+The kinds of things that data mining is good at are in finding patterns and in making predictions under stability. The kinds of things that data mining is less good at are in improving our understanding, or in other words helping improve theory. It also has a tendency to find false positives if you aren’t careful.
 
 *What do I mean by “under stability”? I mean that the process giving us the data doesn’t change. If I roll a six-sided die a thousand times, data mining would be great at predicting that the probability of a 1 is. But if I then switch to a twenty-sided die, that data mining prediction will be bad. It will still predict a chance of a 1 until it gets a lot more data. Probability theory, on the other hand, will properly predict the switch to a chance immediately.*
 
@@ -150,9 +158,9 @@ Of course, the responsible thing to do at that point is to not just take the pat
 
 Research questions can come from lots of places. Mostly, curiosity.
 
-- theory –> hypothesis –> question
+- theory –\> hypothesis –\> question
 
-- data –> opportunity –> question
+- data –\> opportunity –\> question
 
 ## **2.4 How Do You Know if You’ve Got a Good One?**
 
@@ -167,18 +175,6 @@ Research questions can come from lots of places. Mostly, curiosity.
 - Keep It Simple! - Answering any research question can be difficult. Don’t make it even harder on yourself by biting off more than you can chew! A common mistake is to bundle a bunch of research questions into one.
 
 So, consider feasibility, scale, and design. Keep it simple, and think about whether the results you might likely see would tell you anything interesting about the world. After all, learning something interesting and new about the world is our goal!
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### **Homework for Chapter 2: Research Questions**
 
@@ -325,9 +321,9 @@ For empirical work, a useful way to frame it is: data mining is excellent for **
 - *Discovering interesting behavioral or operational patterns that can later be tested in more formal, causal designs.*
 
 **2. Are each of the following questions a good research question? Explain your reasoning. If the question is not good, suggest ways to make it a better question if possible.**
-       
-  **- Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?**
-  
+
+**- Do severe hurricanes cause psychological disorders in children in gestation during the hurricanes?**
+
 Is it a good research question?
 
 Mostly yes: it’s causal, focused on a specific exposure (severe hurricanes) and outcome (psychological disorders), and a defined target group (children in gestation during the hurricanes). The main issues are lack of operational definitions and feasibility.
@@ -372,15 +368,15 @@ For causal inference, you would then think about design (e.g., difference‑in�
 
 *In the above example, SES would be used as a confounder because families with different socioeconomic status may both:*
 
- - *Be differentially exposed to severe hurricanes (e.g., living in more vulnerable housing or areas), and*
+- *Be differentially exposed to severe hurricanes (e.g., living in more vulnerable housing or areas), and*
 
 - *Have different baseline risks for children’s psychological outcomes (through access to health care, stress levels, nutrition, etc.).*
-  
+
   **- Are dogs the best pets?**
-  
+
 Is it a good research question?
 
-No, as written this is not a good empirical research question. It’s vague, value‑laden, and lacks defined constructs. “Best” is a subjective judgment and “pets” is a large, heterogeneous category.  
+No, as written this is not a good empirical research question. It’s vague, value‑laden, and lacks defined constructs. “Best” is a subjective judgment and “pets” is a large, heterogeneous category.
 
 Problems:
 
@@ -415,8 +411,8 @@ It could also be framed more explicitly as multi‑criteria evaluation:
 “How do dog, cat, and small‑animal ownership compare in terms of owner satisfaction, time investment, and annual cost among urban adults?”
 
 That keeps the comparative flavor without asserting “best” up front and supports multi‑dimensional analysis.
-  
-  **- Do organic labels in grocery store items increase sales of those items?**
+
+**- Do organic labels in grocery store items increase sales of those items?**
 
 Is it a good research question?
 
@@ -460,7 +456,7 @@ These versions:
 
 **For defining a good research question, a usful pattern would be:**
 
-**“Does [specific exposure or intervention] lead to [specific, measurable outcome] in [defined population] over [defined time frame]?”**
+**“Does \[specific exposure or intervention\] lead to \[specific, measurable outcome\] in \[defined population\] over \[defined time frame\]?”**
 
 - **fits this pattern with more operational precision.**
 
@@ -478,7 +474,7 @@ These versions:
 
     d.  What kind of data needs to be collected to test the hypothesis?
 
-**4.  For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?).**
+**4. For each of the following theories and research questions, does the research question inform theory (that is, does answering the research question tell you something about the theory?).**
 
 **Theory:**
 
@@ -487,7 +483,7 @@ These versions:
 **Research question:**
 
 - Do negative advertisements increase political campaign donations in US Congressional races more than positive advertisements do?
-        
+
 **Does the question inform the theory:**
 
 Yes, it’s quite well aligned. If negative ads (which focus on attacking an opponent) increase donations more than positive ads (which emphasize liking or supporting the candidate), that pattern supports the idea that donations are primarily motivated by a desire to defeat the opponent rather than by admiration for “our” candidate.
@@ -551,3 +547,203 @@ If plants under thick canopy (i.e., with low light) are less healthy than those 
 If they are equally healthy, or healthier, that would suggest either (a) these plants have strong adaptations (e.g., shade tolerance, alternative energy pathways), or (b) the simple statement “many plants survive because of sunlight” needs to be qualified.
 
 This question doesn’t test the mechanism as directly as, say, controlled experiments varying light intensity, but the observed health differences under different light conditions still provide evidence relevant to the theory.
+
+# **Chapter 3 - Describing Variables**
+
+## **3.1 Descriptions of Variables**
+
+Empirical research questions really come down entirely to describing the density distributions of statistical variables.
+
+In order to make any sense of data we have to know how to take some observations and describe them. The way we do that is by describing the types of variables we have and the distributions they take. Part of that description will be in the form of describing how different variables interact with each other.
+
+A variable, in the context of empirical research, is a bunch of observations of the same measurement - the monthly incomes of 433 South Africans, the number of business mergers in France in each year from 1984 to 2014, the psychological “neuroticism” score from interviews with 744 children, the color of 532 flowers, the top headline from 2,348 consecutive days of The Washington Post. Successfully describing a variable means being able to take those observations and clearly explain what was observed without making someone look through all 744 neuroticism scores themselves.
+
+## **3.2 Types of Variables**
+
+Most common kinds of variables:
+
+- **Continuous variables** are variables that could take any value (perhaps within some range).
+
+- **Count variables** are those that count something. Perhaps how many times something happened or how many of something there are. The number of business mergers in France in a given year is an example of a count variable. Count variables can’t be negative, and they certainly can’t take fractional values. They can be a little tougher to deal with than continuous variables. Sometimes, if a count variable takes many different values, then it acts a lot like a continuous variable, and so researchers often treat them as continuous.
+
+- **Ordinal variables** are variables where some values are “more” and others are “less,” but there’s not necessarily a rule as to how much more “more” is.
+
+- **Categorical variables** are variables recording which category an observation is in. Categorical variables are very common in social science research, where lots of things we’re interested in, like religious affiliation, race, or geographic location, are better described as categories than as numbers.
+
+- A special version of categorical variables is **binary variables**, which are categorical variables that only take two values. Often, these values are “yes” and “no.” Binary variables are handy because they’re a little easier to deal with than categorical variables, since they’re useful in asking about the effects of treatments (Did you get the treatment? Yes or no), and also because categorical variables can be turned into a series of binary variables.
+
+Instead of our religious affiliation variable being categorical with options for “Christian,” “Jewish,” “Muslim,” etc., we could have a bunch of binary variables - “Are you Christian?” Yes or no. “Are you Jewish?”
+
+Plus, it allows for things like someone in your data being both Christian and Jewish.
+
+- **Qualitative variables** are a sort of catch-all category for everything else. They aren’t numeric in nature, but also they’re not categorical.
+
+These can be very tricky to work with and describe, as these kinds of variables tend to contain a lot of detail that resists boiling-down-and-summarizing. Often, in order to summarize these variables, they first get turned into one of the other variable types above.
+
+## **3.3 The Distribution**
+
+A variable’s distribution is a description of how often different values occur.
+
+When it comes to **categorical or ordinal variables**, the variable’s distribution can be described by simply giving the percentage of observations that are in each category or value. The full distribution can be shown in a **frequency table or bar graph**, which just shows the percentage of the sample or population that has each value.
+
+Continuous variables are a little trickier. We can’t just do a frequency table for continuous variables since it’s unlikely that more than one observation takes any specific value.
+
+For **continuous variables**, distributions are described not by the probability that the variable takes a given value, but by the probability that the variable takes a value close to that one.
+
+One common way of expressing the distribution of a continuous variable is with a **histogram**. A histogram carves up the potential range of the data into bins, and shows the proportion of observations that fall into each bin.
+
+```{r}
+#| echo: false
+#| message: false
+
+ggplot(
+  diamonds, 
+  aes(carat)
+) +
+  geom_histogram() +
+  labs(y = "")
+
+```
+
+With a continuous variable, we can go one step further than a histogram all the way to a **density plot** (density distribution if you’re graphing it, probability density if you’re describing it).
+
+```{r}
+#| echo: false
+#| message: false
+
+ggplot(
+  diamonds, 
+  aes(carat)
+) +
+  geom_density() +
+  labs(y = "")
+
+```
+
+A density shows what would happen to a histogram if the bins got narrower and narrower (this only works because we have enough observations to fill in each bin. Otherwise it looks a lot choppier. Formally we need the bins to get narrower and the number of observations to get bigger).
+
+```{r}
+#| echo: false
+#| message: false
+
+d <- 
+  density(diamonds$carat)
+
+dens_df <- 
+  data.frame(
+    x = d$x,
+    y = d$y
+  )
+
+ggplot(
+  dens_df, 
+  aes(x, y)
+) +
+  geom_line(color = "black") +
+  geom_ribbon(
+    data = subset(dens_df, x >= 1 & x <= 2),
+    aes(ymin = 0, ymax = y),
+    fill = "cornflowerblue",
+    alpha = 0.8
+  ) +
+  labs(x = "carat", y = "")
+
+```
+
+When we have a density plot, we can describe the probability of being in a given range of the variable by seeing how large the area underneath the distribution is.
+
+That area, relative to the size of the area under the entire distribution curve, is the probability of the diamond being between 1 and 2 carats.
+
+```{r}
+#| include: false
+
+# calculate the % of shaded area
+
+# kernel density estimate
+d <- 
+  density(diamonds$carat) 
+
+dens_df <- 
+  data.frame(
+    x = d$x,
+    y = d$y
+  )
+
+# total area under the density (should be ~1)
+total_area <- 
+  sum(diff(dens_df$x) * head(dens_df$y, -1))
+
+# area between 1 and 2 carats
+sub_df <- 
+  dens_df |>
+  filter(x >= 1, x <= 2)
+
+area_1_2 <- 
+  sum(diff(sub_df$x) * head(sub_df$y, -1))
+
+# proportion and percentage
+prop_1_2 <- 
+  area_1_2 / total_area
+
+perc_1_2 <- 
+  prop_1_2 * 100
+
+perc_1_2
+
+```
+
+That particular shaded area makes up about 28% of the area underneath the curve, and so 28% of all diamonds have carats between 1 and 2. So, for each possible value the variable could take, we know how likely that outcome, or at least an outcome like it, is.
+
+## **3.4 Summarizing the Distribution**
+
+A distribution is typically summarized by describing its center, spread, and shape, plus any outliers or special regions (like the 1–2 carat band).
+
+**Center (location)**
+
+Common measures:
+
+- **Mean:** arithmetic average; good when the distribution is roughly symmetric and not too heavy‑tailed.
+
+- **Median:** value with 50% below and 50% above; more robust to skew and outliers.
+
+- **Mode:** most frequent value or peak of a density/histogram; useful for multimodal data.
+
+Together, these tell what a “typical” value looks like and whether the distribution is symmetric or skewed (e.g., mean \> median suggests right skew).
+
+**Spread (variability)**
+
+Key summaries:
+
+- **Standard deviation or variance:** average squared deviation from the mean; standard for symmetric, roughly normal distributions.
+
+The way that variation shows up in a distribution graph is in how wide the distribution is.
+
+If the distribution is tall and skinny, then all of the observations are scrunched in very close to the mean. Low variation. If it’s flat and wide, then there are a lot of observations in those fat “tails” on the left and right that are far away from the mean. High variation! The distributions with more area “piled in the middle” have little variation - not a lot of area far from that middle point! The distributions with less “piled in the middle” and more in the “tails” on either side have plenty of observations far away from the middle.
+
+*Variance measures average squared deviation from the mean. Standard deviation is the square root of variance.*
+
+*Variance is convenient in some theoretical and modeling contexts (e.g., ANOVA, regression, some optimization problems) because squared deviations behave nicely algebraically.*
+
+*Standard deviation is more commonly used for describing data because it’s on the same scale as the variable, so you can say things like “most observations are within about 10 units of the mean.”*
+
+*In practice, the variance is often computedas an intermediate step, then standard deviation reported as the more interpretable summary.*
+
+- **Interquartile range (IQR):** 75th percentile minus 25th percentile; robust to outliers and skew.
+
+- **Range or trimmed range:** min–max or central interval (e.g., 2.5th–97.5th percentiles).
+
+- The other two percentiles to focus on are the **minimum, or the 0th percentile, and the maximum, or the 100th percentile.** These are the lowest and highest values the variable takes. They’re handy because they show you the kinds of values that the variable produces. The minimum and maximum height of a large group of people would tell you something about how tall or short humans can possibly be, for example.
+
+- Another nice thing about the minimum and maximum is that we can take the difference between them to get the **range.** The range is one way of seeing how much a variable varies.
+
+**Shape and tails**
+
+Qualitative but important:
+
+- **Skewness:** direction and strength of asymmetry (left/right skew).
+
+- **Modality:** unimodal, bimodal, multimodal.
+
+- **Tail behavior:** presence of heavy tails or extreme values.
+
+Often this is described verbally (“right‑skewed with one dominant mode around 1 carat”) alongside a histogram or density plot.

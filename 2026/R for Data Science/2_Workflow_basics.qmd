@@ -1,6 +1,6 @@
 ---
 title: "2 Workflow: basics"
-format: html
+format: pdf
 editor: visual
 ---
 

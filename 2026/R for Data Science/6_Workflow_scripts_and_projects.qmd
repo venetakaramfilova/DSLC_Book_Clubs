@@ -1,0 +1,51 @@
+---
+title: "6 Workflow: scripts and projects"
+format: html
+editor: visual
+---
+
+### **6.1 Scripts**
+
+Open up the script editor by clicking the File menu, selecting New File, then R script, or using the keyboard shortcut Ctrl + Shift + N.
+
+#### Running code
+
+Ctrl + Enter executes the current R expression in the console.
+
+It will run the complete command that the cursor is at and will also move the cursor to the following statement.
+
+You can also execute the complete script in one step with Ctrl + Shift + S.
+
+#### Saving and naming
+
+RStudio automatically saves the contents of the script editor when you quit, and automatically reloads it when you re-open.
+
+### **6.2 Projects**
+
+#### What is the source of truth?
+
+There is a great pair of keyboard shortcuts that will work together to make sure you’ve captured the important parts of your code in the editor:
+
+Press Ctrl + Shift + F10 to restart R. Press Ctrl + Shift + S to re-run the current script.
+
+#### Where does your analysis live?
+
+You can print this out in R code by running getwd()
+
+#### RStudio projects
+
+```{r}
+
+library(tidyverse)
+
+ggplot(
+  diamonds, 
+  aes(x = carat, y = price)
+) + 
+  geom_hex()
+
+ggsave("6_diamonds.png")
+
+write_csv(diamonds, "diamonds.csv")
+
+```
