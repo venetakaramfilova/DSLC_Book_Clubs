@@ -906,7 +906,6 @@ ggplot(
   )
 ) +
   geom_point()
-
 ```
 
 5.  Make a scatterplot of `bill_depth_mm` vs. `bill_length_mm` and color the points by `species`. What does adding coloring by species reveal about the relationship between these two variables? What about faceting by `species`?
@@ -936,7 +935,6 @@ ggplot(
 ) +
   geom_point() +
   geom_smooth(method = "lm")
-
 ```
 
 6.  Why does the following yield two separate legends? How would you fix it to combine the two legends?
@@ -1050,7 +1048,7 @@ ggplot(
 ) +
   geom_point()
 
-ggsave("1_mpg-plot.png")
+ggsave("images/1_mpg-plot.png")
 ```
 
 2.  What do you need to change in the code above to save the plot as a PDF instead of a PNG? How could you find out what types of image files would work in [`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)?
@@ -1072,5 +1070,5 @@ ggplot(
 ) +
   geom_point()
 
-ggsave("1_mpg-plot.pdf")
+ggsave("images/1_mpg-plot.png")
 ```

@@ -44,9 +44,9 @@ ggplot(
 ) + 
   geom_hex()
 
-ggsave("6_diamonds.png")
+ggsave("images/6_diamonds.png")
 
-write_csv(diamonds, "6_diamonds.csv")
+write_csv(diamonds, "data/06/6_diamonds.csv")
 
 ```
 
