@@ -1,0 +1,771 @@
+---
+title: "7 Data import"
+format: html
+editor: visual
+---
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+
+```
+
+## **7.1 Introduction**
+
+This chapter will focus on reading plain-text rectangular files.
+
+## **7.2 Reading data from a file**
+
+#### CSV
+
+CSVs can be read into R using read_csv(). The first argument is the path.
+
+If the file is located in a local folder:
+
+```{r}
+#| message: false
+#| warning: false
+
+students <- 
+  read_csv("data/students.csv")
+
+```
+
+If the file is in a cloud:
+
+```{r}
+#| message: false
+#| warning: false
+
+students_1 <- 
+  read_csv("https://pos.it/r4ds-students-csv")
+
+```
+
+In the favourite.food column, there are a bunch of food items, and then the character string N/A, which should have been a real NA that R will recognize as “not available”. This is something we can address using the na argument. By default, read_csv() only recognizes empty strings ("") in this dataset as NAs, and we want it to also recognize the character string "N/A".
+
+```{r}
+#| message: false
+#| warning: false
+
+students <- 
+  read_csv("data/students.csv", na = c("N/A", ""))
+
+```
+
+Student ID and Full Name columns are surrounded by backticks. That’s because they contain spaces, breaking R’s usual rules for variable names; they’re non-syntactic names.
+
+Option 1:
+
+```{r}
+
+students |> 
+  rename(
+    student_id = `Student ID`,
+    full_name = `Full Name`
+  )
+
+```
+
+Option 2:
+
+```{r}
+
+janitor::clean_names(students)
+
+```
+
+meal_plan is a categorical variable with a known set of possible values, which in R should be represented as a factor:
+
+```{r}
+
+students |>
+  janitor::clean_names() |>
+  mutate(meal_plan = factor(meal_plan))
+
+```
+
+Currently, age is a character variable because one of the observations is typed out as five instead of a numeric 5.
+
+```{r}
+
+students <- 
+  students |>
+  janitor::clean_names() |>
+  mutate(
+    meal_plan = factor(meal_plan),
+    age = parse_number(if_else(age == "five", "5", age))
+  )
+
+```
+
+read_csv() can read text strings that you’ve created and formatted like a CSV file:
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(
+  "a,b,c
+  1,2,3
+  4,5,6"
+)
+
+```
+
+read_csv() uses the first line of the data for the column names.
+
+You can use skip = n to skip the first n lines or use comment = "\#" to drop all lines that start with (e.g.) #:
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(
+  "The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3",
+  skip = 2
+)
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(
+  "# A comment I want to skip
+  x,y,z
+  1,2,3",
+  comment = "#"
+)
+
+```
+
+The data might not have column names. You can use col_names = FALSE to tell read_csv() not to treat the first row as headings and instead label them sequentially from X1 to Xn:
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = FALSE
+)
+
+```
+
+Or you can pass col_names a character vector which will be used as the column names:
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = c("x", "y", "z")
+)
+
+```
+
+#### Other file types:
+
+- **read_csv2()** reads semicolon-separated files. These use ; instead of , to separate fields and are common in countries that use , as the decimal marker.
+
+- **read_tsv()** reads tab-delimited files.
+
+- **read_delim()** reads in files with any delimiter, attempting to automatically guess the delimiter if you don’t specify it.
+
+- **read_fwf()** reads fixed-width files. You can specify fields by their widths with fwf_widths() or by their positions with fwf_positions().
+
+- **read_table()** reads a common variation of fixed-width files where columns are separated by white space.
+
+- **read_log()** reads Apache-style log files.
+
+#### Exercises
+
+1.  What function would you use to read a file where fields were separated with “\|”?
+
+read_delim() since it reads files with any delimiter.
+
+2.  Apart from file, skip, and comment, what other arguments do read_csv() and read_tsv() have in common?
+
+All arguments are the same, just different order at the end.
+
+| read_csv()                           | read_tsv()                           |
+|------------------------------------|------------------------------------|
+| file                                 | file                                 |
+| col_names = TRUE                     | col_names = TRUE                     |
+| col_types = NULL                     | col_types = NULL                     |
+| col_select = NULL                    | col_select = NULL                    |
+| id = NULL                            | id = NULL                            |
+| locale = default_locale()            | locale = default_locale()            |
+| na = c("", "NA")                     | na = c("", "NA")                     |
+| quoted_na = deprecated()             | quoted_na = deprecated()             |
+| quote = """                          | quote = """                          |
+| comment = ""                         | comment = ""                         |
+| trim_ws = TRUE                       | trim_ws = TRUE                       |
+| skip = 0                             | skip = 0                             |
+| n_max = Inf                          | n_max = Inf                          |
+| guess_max = min(1000, n_max)         | guess_max = min(1000, n_max)         |
+| name_repair = "unique"               | progress = show_progress()           |
+| num_threads = readr_threads()        | name_repair = "unique"               |
+| progress = show_progress()           | num_threads = readr_threads()        |
+| show_col_types = should_show_types() | show_col_types = should_show_types() |
+| skip_empty_rows = TRUE               | skip_empty_rows = TRUE               |
+| lazy = should_read_lazy()            | lazy = should_read_lazy()            |
+
+3.  What are the most important arguments to read_fwf()?
+
+The **two critical arguments** are `col_positions` and `col_types`. They determine *how the file is parsed* and *how each column is interpreted*.
+
+- col_positions - This is the **most important** argument because fixed‑width files have **no delimiters**. R needs explicit boundaries. It is defined by using:
+
+  - fwf_widths()
+
+    ```{r}
+
+    fwf_widths(c(10, 8, 5))
+
+    ```
+
+  - fwf_positions()
+
+    ```{r}
+
+    fwf_positions(
+      start = c(1, 11, 19),
+      end   = c(10, 18, 23)
+    )
+
+    ```
+
+- col_types — The second most important argument. **read_fwf()** will guess types, but guessing is dangerous in fixed‑width formats.
+
+  ```{r}
+  #| eval: false
+
+  col_types = "cid"   # character, integer, double
+    
+  ```
+
+  or more explicit:
+
+  ```{r}
+  #| eval: false
+
+  col_types = cols(
+    station = col_character(),
+    year    = col_integer(),
+    value   = col_double()
+  )
+    
+  ```
+
+- col_names - Fixed‑width files often lack headers.
+
+  ```{r}
+  #| eval: false
+
+  col_names = c("station", "year", "value")
+    
+  ```
+
+- skip and n_max - FWF files often contain metadata or multi-line headers.
+
+  - skip → skip top lines
+
+  - n_max → read only part of the file
+
+  ```{r}
+  #| eval: false
+
+  read_fwf("file.txt", col_positions, skip = 2, n_max = 1000)
+
+  ```
+
+- na - Legacy formats often use weird missing-value markers
+
+  ```{r}
+  #| eval: false
+
+  na = c("", "NA", "-9999", "***")
+
+  ```
+
+- locale - Controls encoding, decimal marks, grouping marks.
+
+  ```{r}
+  #| eval: false
+
+  locale = locale(encoding = "UTF-8")
+
+  ```
+
+| Argument | Why it matters | When to use |
+|------------------------|------------------------|------------------------|
+| `col_positions` | Defines column boundaries; essential | Always |
+| `col_types` | Prevents type guessing errors | Numeric/text mix |
+| `col_names` | Adds readable column names | No header present |
+| `skip` **/** `n_max` | Clean metadata / partial reads | Messy or large files |
+| `na` | Handles custom missing markers | Legacy datasets |
+| `locale` | Fixes encoding issues | Non‑UTF files |
+
+4.  Sometimes strings in a CSV file contain commas. To prevent them from causing problems, they need to be surrounded by a quoting character, like `"` or `'`. By default, `read_csv()` assumes that the quoting character will be `"`. To read the following text into a data frame, what argument to `read_csv()` do you need to specify?
+
+    ```         
+    "x,y\n1,'a,b'"
+    ```
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(I("x,y\n1,'a,b'"), quote = "'")
+
+```
+
+5.  Identify what is wrong with each of the following inline CSV files. What happens when you run the code?
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("a,b\n1,2,3\n4,5,6")
+
+```
+
+The csv is parsed incorrectly.
+
+Rows have too many columns compared to the header. - Header: 2 columns (a, b) - Data rows: 3 columns (1,2,3 and 4,5,6)
+
+The values in column b are 23 and 56, because readr concatenates the extra values into the last column when it tries to repair the row.
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("a,b,c\n1,2\n1,2,3,4")
+
+```
+
+The csv is parsed incorrectly. There is 1 value more than the number of columns, so the extra value is concatenated to the previous one.
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("a,b\n\"1")
+
+```
+
+The problem is that the second row starts with an opening quote, but there is no closing quote, so the CSV is malformed. In readr, that typically produces a parsing warning about an unmatched quote and leaves the value as 1 with the second column missing or otherwise misparsed. In the string, the second backslash is only there to escape the quote inside the R string literal.
+
+- `\n` = a newline in the text passed to `read_csv()`
+- `\"` = a literal double quote character in that text
+
+If you want to keep the literal CSV text structure and just fix the malformed quote, you would usually write:
+
+read_csv("a,b\n"1"")
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("a,b\n1,2\na,b")
+
+```
+
+The issue is not malformed structure; the issue is that the values are mixed types, which means the columns won’t be numeric.
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("a;b\n1;3")
+
+```
+
+The issue is that read_csv() expects commas by default, but your text uses semicolons as the delimiter. So read_csv("a;b\n1;3") will treat each line as a single column instead of splitting it into two columns. Can be replaced with:
+
+read_csv2("a;b\n1;3")
+
+or
+
+read_delim("a;b\n1;3", delim = ";")
+
+6.  Practice referring to non-syntactic names in the following data frame by:
+
+```{r}
+
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+```
+
+- Extracting the variable called 1.
+
+```{r}
+
+annoying$`1`
+
+```
+
+- Plotting a scatterplot of 1 vs. 2.
+
+```{r}
+
+ggplot(
+  annoying, 
+  aes(x = `1`, y = `2`)
+) +
+  geom_point()
+
+```
+
+- Creating a new column called 3, which is 2 divided by 1.
+
+and
+
+- Renaming the columns to one, two, and three.
+
+```{r}
+
+annoying |> 
+  mutate(`3` = `2` / `1`) |> 
+  rename(one = `1`, two = `2`, three = `3`)
+```
+
+## **7.3 Controlling column types**
+
+A CSV file doesn’t contain any information about the type of each variable (i.e. whether it’s a logical, number, string, etc.), so readr will try to guess the type.
+
+#### Guessing types
+
+readr uses a heuristic to figure out the column types. For each column, it pulls the values of 1,000 rows(override the default of 1000 with the `guess_max` argument) spaced evenly from the first row to the last, ignoring missing values. It then works through the following questions:
+
+- Does it contain only F, T, FALSE, or TRUE (ignoring case)? If so, it’s a logical.
+- Does it contain only numbers (e.g., 1, -4.5, 5e6, Inf)? If so, it’s a number.
+- Does it match the ISO8601 standard? If so, it’s a date or date-time. (We’ll return to date-times in more detail in Section 17.2).
+- Otherwise, it must be a string.
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv("
+  logical,numeric,date,string
+  TRUE,1,2021-01-15,abc
+  false,4.5,2021-02-15,def
+  T,Inf,2021-02-16,ghi
+")
+
+```
+
+#### Missing values, column types, and problems
+
+The most common way column detection fails is that a column contains unexpected values, and you get a character column instead of a more specific type.
+
+```{r}
+
+simple_csv <- 
+  "x
+  10
+  .
+  20
+  30"
+
+read_csv(simple_csv)
+```
+
+Here, the missing value `.`is easily seen. But that might not be the case. One approach is to tell readr that x is a numeric column, and then see where it fails. You can do that with the col_types argument, which takes a named list where the names match the column names in the CSV file:
+
+```{r}
+
+df <- 
+  read_csv(
+    simple_csv, 
+    col_types = list(x = col_double())
+  )
+
+df
+```
+
+`read_csv()` reports that there was a problem, and tells us we can find out more with `problems()`:
+
+```{r}
+
+problems(df)
+
+```
+
+This tells us that there was a problem in row 3, col 1 where readr expected a double but got a .. That suggests this dataset uses . for missing values. So then we set na = ".", the automatic guessing succeeds, giving us the numeric column that we want:
+
+```{r}
+#| message: false
+#| warning: false
+
+read_csv(simple_csv, na = ".")
+
+```
+
+#### Column types
+
+readr provides a total of nine column types:
+
+- `col_logical()` and `col_double()` read logicals and real numbers. They’re relatively rarely needed (except as above), since readr will usually guess them for you.
+- `col_integer()` reads integers. We seldom distinguish integers and doubles in this book because they’re functionally equivalent, but reading integers explicitly can occasionally be useful because they occupy half the memory of doubles.
+- `col_character()` reads strings. This can be useful to specify explicitly when you have a column that is a numeric identifier, i.e., long series of digits that identifies an object but doesn’t make sense to apply mathematical operations to. Examples include phone numbers, social security numbers, credit card numbers, etc.
+- `col_factor()`, `col_date()`, and `col_datetime()` create factors, dates, and date-times respectively.
+- `col_number()` is a permissive numeric parser that will ignore non-numeric components, and is particularly useful for currencies.
+- `col_skip()` skips a column so it’s not included in the result, which can be useful for speeding up reading the data if you have a large CSV file and you only want to use some of the columns.
+
+It’s also possible to override the default heuristic that guesses types by switching from list() to cols() and specifying .default:
+
+```{r}
+
+another_csv <- 
+  "x,y,z
+  1,2,3"
+
+read_csv(
+  another_csv, 
+  col_types = cols(.default = col_character())
+)
+
+```
+
+`cols_only()` will read in only the columns you specify:
+
+```{r}
+
+read_csv(
+  another_csv,
+  col_types = cols_only(x = col_character())
+)
+
+```
+
+## **7.4 Reading data from multiple files**
+
+If you have sales data for multiple months, with each month’s data in a separate file: 01-sales.csv for January, 02-sales.csv for February, and 03-sales.csv for March. With read_csv() you can read these data in at once and stack them on top of each other in a single data frame.
+
+```{r}
+#| message: false
+#| warning: false
+
+
+sales_files <- 
+  c(
+    "data/07/01-sales.csv", 
+    "data/07/02-sales.csv", 
+    "data/07/03-sales.csv"
+  )
+
+read_csv(sales_files, id = "file")
+
+```
+
+or if you have them online:
+
+```{r}
+#| message: false
+#| warning: false
+
+
+sales_files <- 
+  c(
+    "https://pos.it/r4ds-01-sales",
+    "https://pos.it/r4ds-02-sales",
+    "https://pos.it/r4ds-03-sales"
+  )
+read_csv(sales_files, id = "file")
+
+```
+
+The id argument adds a new column called file to the resulting data frame that identifies the file the data come from.
+
+If you have many files you want to read in, it can get cumbersome to write out their names as a list. Instead, you can use the base list.files() function to find the files for you by matching a pattern in the file names:
+
+```{r}
+
+sales_files <- 
+  list.files(
+    "data/07", 
+    pattern = "sales\\.csv$", 
+    full.names = TRUE
+  )
+
+sales_files
+
+```
+
+## **7.2 Writing to a file**
+
+```{r}
+
+write_csv(students, "data/07/students.csv")
+
+```
+
+Note that the variable type information that was previously set up is lost when you save to CSV because you’re starting over with reading from a plain text file again:
+
+```{r}
+
+read_csv("data/07/students.csv")
+
+```
+
+There are two main alternatives:
+
+1.  `write_rds()` and `read_rds()`. These store data in R’s custom binary format called RDS. This means that when you reload the object, you are loading the exact same R object that you stored.
+
+```{r}
+
+write_rds(students, "data/07/students.rds")
+
+read_rds("data/07/students.rds")
+
+```
+
+2.  The arrow package allows you to read and write parquet files, a fast binary file format that can be shared across programming languages:
+
+```{r}
+
+library(arrow)
+
+write_parquet(students, "data/07/students.parquet")
+
+read_parquet("data/07/students.parquet")
+
+```
+
+## **7.6 Data entry**
+
+`tibble()` works by column:
+
+```{r}
+
+tibble(
+  x = c(1, 2, 5), 
+  y = c("h", "m", "g"),
+  z = c(0.08, 0.83, 0.60)
+)
+
+```
+
+`tribble()`, short for **tr**ansposed t**ibble**, lets you lay out your data row by row. tribble() is customized for data entry in code: column headings start with \~ and entries are separated by commas.
+
+```{r}
+
+tribble(
+  ~x, ~y, ~z,
+  1, "h", 0.08,
+  2, "m", 0.83,
+  5, "g", 0.60
+)
+
+```
+
+#### tibble() vs data.frame()
+
+https://www.listendata.com/2024/05/tibble-vs-dataframe-with-examples.html
+
+1.  When you print a tibble, it doesn't show all the data. Whereas, data frame prints the complete data.
+
+**Note** tibble is a part of the tibble package. When you load dplyr package, it is also loaded.
+
+```{r}
+
+df <- 
+  data.frame(x = 1:50, y = seq(1,100,2))
+
+tb <- 
+  tibble(x = 1:50, y = seq(1,100,2))
+
+df
+
+tb
+
+```
+
+2.  data.frame() returns values of a column when you use a partial column name to access it. Whereas, tibble() returns error - `Unknown or uninitialised column`.
+
+```{r}
+
+df <- 
+  data.frame(ids = 1:50, score = seq(1,100,2))
+
+tb <- 
+  tibble(ids = 1:50, score = seq(1,100,2))
+
+```
+
+In the example below, we are using "id" instead of "ids" to access the column.
+
+```{r}
+
+df$id
+
+tb$id
+
+```
+
+3.  A tibble remains a tibble when you extract a single column from it, whereas a data frame becomes a vector when you select a single column from it.
+
+```{r}
+
+df <- 
+  data.frame(ids = 1:50, score = seq(1,100,2))
+
+tb <- 
+  tibble(ids = 1:50, score = seq(1,100,2))
+
+tb2 <- 
+  tb[,"score"]
+
+df2 <- 
+  df[,"score"]
+
+is_tibble(tb2)
+
+is.data.frame(df2)
+
+```
+
+4.  When adding a new column to a tibble, the number of rows must match the number of rows in the other columns. Whereas, data frame adds a column even when the length of the new column is different than the others.
+
+```{r}
+
+tb$newcol <- 
+  c(5,6)
+
+df$newcol <- 
+  c(5,6)
+
+```
+
+In R, the recycling rule is a feature of its vectorized operations. It means that when two vectors of different lengths are used in an operation, the shorter vector is repeated (recycled) until it matches the length of the longer vector.
+
+How it works:
+
+- Element-wise operations in R require vectors to be of the same length.
+
+- If they are not, R automatically repeats the elements of the shorter vector.
+
+- If the length of the longer vector is not a multiple of the shorter one, R still recycles but gives a warning.
+
+We can see vector recycling, when we perform some kind of operations like addition, subtraction. . . .etc on two vectors of unequal length. The vector with a small length will be repeated as long as the operation completes on the longer vector. If we perform an addition operation on a vector of equal length the first value of vector1 is added with the first value of vector 2 like that. The below image demonstrated operation on unequal vectors and operation on equal vector.
+
+![](https://media.geeksforgeeks.org/wp-content/uploads/20210512183925/wed8-300x199.PNG){fig-align="center"}
+
+So, the repetition of small length vector as long as completion of operation on long length vector is known as **vector recycling**. This is the special property of vectors is available in R language.
