@@ -1,0 +1,790 @@
+---
+title: "14 Strings"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(babynames)
+```
+
+## **14.1 Introduction**
+
+This chapter is about strings and character vectors. All stringr functions start with **`str_`**.
+
+- Create strings
+- Combine strings
+- Separate strings into rows and columns
+- Measure the lengths of strings
+- Extract substrings from strings
+- Work with strings in different alphabets
+
+## **14.2 Creating a string**
+
+- use either single quotes **`(')`** if the string contains multiple **`(")`** or double quotes **`(")`**.
+
+```{r}
+
+string1 <- 
+  "This is a string"
+
+string2 <- 
+  'If I want to include a "quote" inside a string, I use single quotes'
+```
+
+### Escapes
+
+To include a literal single or double quote in a string, you can use **`\`** to “escape” it:
+
+```{r}
+
+double_quote <- 
+  "\"" 
+# or 
+double_quote_2 <- 
+  '"'
+
+single_quote <- 
+  '\'' 
+# or "'"
+single_quote_2 <- 
+  "'"
+```
+
+- if you want to include a literal backslash in your string, you’ll need to escape it: **`"\\"`**:
+
+```{r}
+
+backslash <- 
+  "\\"
+```
+
+- printed representation of a string shows the escapes. To see the raw content use **str_view()**:
+
+```{r}
+
+x <- 
+  c(single_quote, double_quote, backslash)
+
+str_view(x)
+
+```
+
+### Raw strings
+
+- Creating a string with multiple quotes or backslashes
+
+```{r}
+
+tricky <- 
+  "double_quote <- \"\\\"\" # or '\"' 
+single_quote <- '\\'' # or \"'\""
+
+str_view(tricky)
+```
+
+- using a raw string instead
+
+A raw string usually starts with **`r"(`** and finishes with **`)"`**. But if your string contains **`)"`** you can instead use **`r"[]"`** or **`r"{}"`**, and if that’s still not enough, you can insert any number of dashes to make the opening and closing pairs unique, e.g., **`r"--()--"`**, **`r"---()---"`**.
+
+```{r}
+
+tricky <- 
+  r"(double_quote <- "\"" # or '"' 
+single_quote <- '\'' # or "'")"
+
+str_view(tricky)
+```
+
+### Other special characters
+
+- **`\n`** use for a new line
+- **`\t`** use for tab
+- **`\u`** or **`\U`** use for Unicode escapes
+- **?Quotes** - complete list of other special characters
+
+str_view() uses curly braces for tabs to make them easier to spot.
+
+```{r}
+
+x <- 
+  c("one\ntwo", "one\ttwo", "\u00b5", "\U0001f604")
+
+x
+
+str_view(x)
+
+```
+
+## **Exercises**
+
+1.  Create strings that contain the following values:
+
+- He said "That's amazing!"
+
+- `\a\b\c\d`
+
+- `\\\\\\`
+
+```{r}
+
+amazing <- 
+  r"(He said "That's amazing!")"
+
+ab <-
+  r"(\a\b\c\d)"
+
+abc <-
+  r"[(\a\b\c\d)]"
+  
+backslash <-
+  r"(\\\\\\)"
+  
+x <- 
+  r"--(This has \n and \t and "quotes" and 'apostrophes' and backslashes: \ and [])--"
+```
+
+2.  Create the string in your R session and print it. What happens to the special `“\u00a0”`? How does str_view() display it? Can you do a little googling to figure out what this special character is?
+
+**`\u00a0`** means a non-breaking space (NBSP) in Unicode:
+
+- Prevents line breaks
+- Keeps words together
+- Preserves extra spaces
+
+```{r}
+
+x <- 
+  "This\u00a0is\u00a0tricky"
+```
+
+## **14.3 Creating many strings from data**
+
+### str_c() 
+
+Takes any number of vectors as arguments and returns a character vector:
+
+```{r}
+
+str_c("x", "y")
+
+str_c("x", "y", "z")
+
+str_c("Hello ", c("John", "Susan"))
+
+```
+
+It is designed to be used with mutate() by obeying the usual tidyverse rules for recycling and propagating missing values:
+
+```{r}
+
+df <- 
+  tibble(
+    name = c("Flora", "David", "Terra", NA)
+  )
+
+df |> 
+  mutate(greeting = str_c("Hi ", name, "!"))
+```
+
+- coalesce() - replace missing values:
+
+```{r}
+
+df |> 
+  mutate(
+    greeting1 = str_c("Hi ", coalesce(name, "you"), "!"),
+    greeting2 = coalesce(str_c("Hi ", name, "!"), "Hi!")
+  )
+```
+
+### str_glue()
+
+Anything inside {} will be evaluated like it’s outside of the quotes. It currently converts missing values to the string "NA":
+
+```{r}
+
+df |> 
+  mutate(greeting = str_glue("Hi {name}!"))
+```
+
+- If you need to escape special character, you double up that special characters:
+
+```{r}
+
+df |> 
+  mutate(greeting = str_glue("{{Hi {name}!}}"))
+```
+
+### str_flatten()
+
+Works well with summarize because it takes a character vector and combines each element of the vector into a single string:
+
+```{r}
+
+str_flatten(c("x", "y", "z"))
+
+str_flatten(
+  c("x", "y", "z"), 
+  ", "
+)
+
+str_flatten(
+  string = c("x", "y", "z"), 
+  collapse = ", ", 
+  last = ", and "
+)
+```
+
+```{r}
+
+df <- 
+  tribble(
+    ~ name, ~ fruit,
+    "Carmen", "banana",
+    "Carmen", "apple",
+    "Marvin", "nectarine",
+    "Terence", "cantaloupe",
+    "Terence", "papaya",
+    "Terence", "mandarin"
+  )
+
+df |>
+  group_by(name) |> 
+  summarize(fruits = str_flatten(fruit, ", "))
+```
+
+## **Exercises**
+
+1.  Compare and contrast the results of paste0() with str_c() for the following inputs:
+
+- handle NA differntly - **`str_c()`** treats NA as a real missing value; **`paste0()`** converts its arguments (*via* [`as.character`](http://127.0.0.1:8728/help/library/base/help/as.character)) to character strings and then concatenates it - so NA is converted to the character string "NA"
+- recycling rules - **`str_c()`** uses stricter “tidyverse” recycling: it will not silently recycle a length-2 vector to match a length-3 vector, so it errors; **`paste0()`** uses base R recycling: it recycles letters\[1:2\] to length 3
+
+```{r}
+#| error: true
+
+str_c("hi ", NA)
+str_c(letters[1:2], letters[1:3])
+```
+
+```{r}
+
+paste0("hi ", NA)
+paste0(letters[1:2], letters[1:3])
+```
+
+2.  What’s the difference between paste() and paste0()? How can you recreate the equivalent of paste() with str_c()?
+
+- paste() and paste0() differ mainly in their default separator: paste() uses a space, while paste0() uses no separator.
+- str_c() behaves like paste0() by default: it uses sep = "". The equivalent would be to explicitly pass a space (doesn't apply to NA values. They will be handdled differntly:
+
+```{r}
+
+str_c("a", "b", sep = " ")
+
+paste("a", "b")
+
+```
+
+3.  Convert the following expressions from str_c() to str_glue() or vice versa:
+
+<!-- rs -->
+
+a.  `str_c("The price of ", food, " is ", price)`
+b.  `str_glue("I'm {age} years old and live in {country}")`
+c.  `str_c("\\\\section{", title, "}")`
+
+```{r}
+#| error: true
+
+str_glue("The price of {food} is {price}")
+
+str_c("I'm ", age, " years old and live in ", country)
+
+str_glue("\\\\section{{{title}}}")
+```
+
+## **14.4 Extracting data from strings**
+
+tidyr functions to extract multiple variables to be crammed together into a single string:
+
+- `df |> separate_longer_delim(col, delim)`
+- `df |> separate_longer_position(col, width)`
+- `df |> separate_wider_delim(col, delim, names)`
+- `df |> separate_wider_position(col, widths)`
+
+Just like with **`pivot_longer()`** and **`pivot_wider()`**, **`_longer functions`** make the input data frame longer by creating new rows and **`_wider`** functions make the input data frame wider by generating new columns.
+
+**`delim`** splits up a string with a delimiter like **`", "`** or **`" "`**; **`position`** splits at specified widths, like **`c(3, 5, 2)`**.
+
+### Separating into rows 
+
+When the number of components varies from row to row:
+
+```{r}
+
+df1 <- 
+  tibble(x = c("a,b,c", "d,e", "f"))
+
+df1
+
+df1 |> 
+  separate_longer_delim(x, delim = ",")
+```
+
+```{r}
+
+df2 <- 
+  tibble(x = c("1211", "131", "21"))
+
+df2
+
+df2 |> 
+  separate_longer_position(x, width = 1)
+```
+
+### Separating into columns 
+
+Most useful when there are a fixed number of components in each string, and you want to spread them into columns.
+
+```{r}
+# x is made up of a code, an edition number, and a year, separated by "."
+
+df3 <- 
+  tibble(x = c("a10.1.2022", "b10.2.2011", "e15.1.2015"))
+
+df3
+
+df3 |> 
+  separate_wider_delim(
+    x,
+    delim = ".",
+    names = c("code", "edition", "year")
+  )
+
+```
+
+- If a specific piece is not useful you can use an NA name to omit it from the results:
+
+```{r}
+
+df3 |> 
+  separate_wider_delim(
+    x,
+    delim = ".",
+    names = c("code", NA, "year")
+  )
+```
+
+```{r}
+
+df4 <- 
+  tibble(x = c("202215TX", "202122LA", "202325CA")) 
+
+df4
+
+df4 |> 
+  separate_wider_position(
+    x,
+    widths = c(year = 4, age = 2, state = 2)
+  )
+```
+
+### Diagnosing widening problems
+
+separate_wider_delim() requires a fixed and known set of columns
+
+```{r}
+#| error: true
+
+df <- 
+  tibble(a = c("1-1-1", "1-1-2", "1-3", "1-3-2", "1"))
+
+df
+
+df |> 
+  separate_wider_delim(
+    a,
+    delim = "-",
+    names = c("x", "y", "z")
+  )
+```
+
+- debugging:
+
+```{r}
+
+debug <- 
+  df |> 
+    separate_wider_delim(
+      a,
+      delim = "-",
+      names = c("x", "y", "z"),
+      too_few = "debug"
+    )
+
+debug
+```
+
+- **`a_ok`** lets you quickly find the inputs that failed
+- **`a_pieces`**, tells us how many pieces were found, compared to the expected 3 (the length of names)
+- **`a_remainder`**
+
+Fix the problem upstream and make sure to remove **`too_few = "debug"`** to ensure that new problems become errors.
+
+```{r}
+
+debug |> 
+  filter(!a_ok)
+```
+
+- **`too_few = "align_start"`** and **`too_few = "align_end"`** allow you to fill in the missing pieces with **NAs** and to control where the **NAs** should go:
+
+```{r}
+
+df |> 
+  separate_wider_delim(
+    a,
+    delim = "-",
+    names = c("x", "y", "z"),
+    too_few = "align_start"
+  )
+```
+{{< pagebreak >}}
+
+- too many pieces:
+
+```{r}
+#| error: true
+
+df <- 
+  tibble(a = c("1-1-1", "1-1-2", "1-3-5-6", "1-3-2", "1-3-5-7-9"))
+
+df |> 
+  separate_wider_delim(
+    a,
+    delim = "-",
+    names = c("x", "y", "z")
+  )
+```
+
+- debugging:
+
+```{r}
+
+debug <- 
+  df |> 
+    separate_wider_delim(
+      a,
+      delim = "-",
+      names = c("x", "y", "z"),
+      too_many = "debug"
+    )
+
+debug |> 
+  filter(!a_ok)
+```
+
+Either silently “drop” any additional pieces or “merge” them all into the final column:
+
+```{r}
+
+df |> 
+  separate_wider_delim(
+    a,
+    delim = "-",
+    names = c("x", "y", "z"),
+    too_many = "drop"
+  )
+
+df |> 
+  separate_wider_delim(
+    a,
+    delim = "-",
+    names = c("x", "y", "z"),
+    too_many = "merge"
+  )
+```
+{{< pagebreak >}}
+
+## **14.5 Letters**
+
+### Length
+
+- **str_length()** tells you the number of letters in the string:
+
+```{r}
+
+str_length(c("a", "R for data science", NA))
+```
+
+- **str_length()** + **count()** :
+
+```{r}
+
+# longest names in US babynames
+
+babynames |>
+  count(length = str_length(name), wt = n) 
+  
+
+babynames |> 
+  filter(str_length(name) == 15) |> 
+  count(name, wt = n, sort = TRUE)
+```
+
+### Subsetting
+
+- **str_sub(string, start, end)** - extract parts of a string (start and end are the positions where the substring should start and end. The start and end arguments are inclusive, so the length of the returned string will be end - start + 1):
+
+```{r}
+
+x <- 
+  c("Apple", "Banana", "Pear")
+
+str_sub(x, 1, 3)
+```
+
+- use negative values to count back from the end of the string:
+
+```{r}
+
+str_sub(x, -3, -1)
+```
+
+- if the string is too short: it will just return as much as possible:
+
+```{r}
+
+str_sub("a", 1, 5)
+```
+{{< pagebreak >}}
+
+- **str_sub()** with **mutate()** to find the first and last letter of each name:
+
+```{r}
+
+babynames |> 
+  mutate(
+    first = str_sub(name, 1, 1),
+    last = str_sub(name, -1, -1)
+  )
+```
+
+## **Exercises**
+
+1.  When computing the distribution of the length of babynames, why did we use wt = n?
+
+Each row in babynames is already an aggregated count: n is the number of babies with that name, sex, and year—not one baby. Weighting by n makes the distribution reflect babies, rather than dataset rows.
+
+{{< pagebreak >}}
+
+2.  Use str_length() and str_sub() to extract the middle letter from each baby name. What will you do if the string has an even number of characters?
+
+```{r}
+
+babynames |>
+  mutate(
+    length = str_length(name),
+    int = str_length(name) %/% 2,
+    middle = str_sub(
+      name, 
+      str_length(name) %/% 2 + 1, 
+      str_length(name) %/% 2 + 1
+    ),
+  ) |>
+  select(name, length, int, middle)
+```
+{{< pagebreak >}}
+
+3.  Are there any major trends in the length of babynames over time? What about the popularity of first and last letters?
+
+```{r}
+
+# trends over time
+babynames |> 
+  mutate(length = str_length(name)) |> 
+  count(year, length, wt = n) |> 
+  ggplot(
+    aes(year, n)
+  ) +
+  geom_line() +
+  scale_colour_viridis_d(option = "turbo") +
+  scale_y_continuous(
+    labels = scales::label_number(
+      scale_cut = scales::cut_short_scale()
+    )
+  ) +
+  facet_wrap(~length)
+  
+```
+{{< pagebreak >}}
+
+```{r}
+#| warning: false
+
+# from Federica
+babynames |> 
+  mutate(length = str_length(name)) |> 
+  count(year, length, wt = n) |> 
+  ggplot(
+    aes(year, n, group = length, colour = length)) +
+  geomtextpath::geom_textpath(aes(label = length),
+                                 position = "jitter") +
+  scale_colour_viridis_c(option = "turbo") +
+  scale_y_continuous(
+    labels = scales::label_number(
+      scale_cut = scales::cut_short_scale()
+    )
+  ) +
+    theme(legend.position = "none")
+
+```
+{{< pagebreak >}}
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7.5
+
+# popularity first letter
+babynames |>
+  mutate(first = str_sub(name, 1, 1)) |>
+  count(year, first, wt = n, sort = TRUE) |>
+  ggplot(
+    aes(year, n)
+  ) +
+  geom_line() +
+  labs(y = "Number of babies") +
+  scale_colour_viridis_d(option = "turbo") +
+  scale_y_continuous(
+    labels = scales::label_number(
+      scale_cut = scales::cut_short_scale()
+    )
+  ) +
+  facet_wrap( ~first, ncol = 4)
+```
+{{< pagebreak >}}
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7.5
+
+# popularity last letter
+babynames |>
+  mutate(last = str_sub(name, -1)) |>
+  count(year, last, wt = n, sort = TRUE) |>
+  ggplot(
+    aes(year, n)
+  ) +
+  geom_line() +
+  labs(y = "Number of babies") +
+  scale_colour_viridis_d(option = "turbo") +
+  scale_y_continuous(
+    labels = scales::label_number(
+      scale_cut = scales::cut_short_scale()
+    )
+  ) +
+  facet_wrap( ~last, ncol = 4)
+```
+{{< pagebreak >}}
+
+## **14.6 Non-English text**
+
+### Encoding
+
+- **charToRaw()** - get at the underlying representation of a string using (ASCII encoding)
+
+```{r}
+
+charToRaw("Hadley")
+```
+
+- readr uses UTF-8 everywhere (will fail for data produced by older systems that don’t use UTF-8)
+
+```{r}
+#| eval: false
+
+x1 <- 
+  "text\nEl Ni\xf1o was particularly bad this year"
+
+read_csv(x1)$text
+
+
+x2 <- 
+  "text\n\x82\xb1\x82\xf1\x82\xc9\x82\xbf\x82\xcd"
+
+read_csv(x2)$text
+
+```
+- To read these correctly, you specify the encoding via the locale argument:
+
+```{r}
+#| eval: false
+
+read_csv(x1, locale = locale(encoding = "Latin1"))$text
+
+read_csv(x2, locale = locale(encoding = "Shift-JIS"))$text
+```
+
+- **guess_encoding()** - helps find the correct encoding. Works better when you have lots of text.
+
+http://kunststube.net/encoding/
+
+### Letter variations
+
+Working in languages with accents poses a significant challenge when determining the position of letters (e.g., with str_length() and str_sub()) as accented letters might be encoded as a single individual character (e.g., ü) or as two characters by combining an unaccented letter (e.g., u) with a diacritic mark (e.g., ¨)
+
+```{r}
+
+u <- 
+  c("\u00fc", "u\u0308")
+
+str_view(u)
+
+```
+
+Both strings look the same but differ in length, and their first characters are different:
+
+```{r}
+
+str_length(u)
+
+str_sub(u, 1, 1)
+```
+
+```{r}
+
+u[[1]] == u[[2]]
+
+str_equal(u[[1]], u[[2]])
+```
+
+### Locale-dependent functions
+
+There are a handful of **stringr** functions whose behavior depends on your locale. A locale is similar to a language but includes an optional region specifier to handle regional variations within a language.
+
+- **stringi::stri_locale_list()** - see which are supported in stringr
+
+Base R string functions automatically use the locale set by your operating system. This means that base R string functions do what you expect for your language, but your code might work differently if you share it with someone who lives in a different country. 
+
+```{r}
+
+str_to_upper(c("i", "ı"))
+
+str_to_upper(c("i", "ı"), locale = "tr")
+
+```
+Sorting strings depends on the order of the alphabet, and the order of the alphabet is not the same in every language
+
+```{r}
+
+str_sort(c("a", "c", "ch", "h", "z"))
+
+str_sort(c("a", "c", "ch", "h", "z"), locale = "cs")
+```
+This also comes up when sorting strings with dplyr::arrange(), which is why it also has a locale argument.
