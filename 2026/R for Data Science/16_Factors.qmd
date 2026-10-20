@@ -62,6 +62,7 @@ sort(y1)
 
 ```{r}
 #| error: true
+#| message: true
 
 # any values not in the level will be silently converted to NA
 y2 <- 
@@ -531,6 +532,7 @@ ggplot(
     title = "How average age varies across reported income levels"
   )
 ```
+
 {{< pagebreak >}}
 
 ## **16.5 Modifying factor levels**
@@ -542,6 +544,7 @@ ggplot(
 gss_cat |> 
   count(partyid)
 ```
+
 {{< pagebreak >}}
 
 - The levels are terse and inconsistent. Let’s tweak them to be longer and use a parallel construction.
@@ -562,6 +565,7 @@ gss_cat |>
   ) |>
   count(partyid)
 ```
+
 {{< pagebreak >}}
 
 - To combine groups, you can assign multiple old levels to the same new level:
@@ -570,7 +574,8 @@ gss_cat |>
 
 gss_cat |>
   mutate(
-    partyid = fct_recode(partyid,
+    partyid = fct_recode(
+      partyid,
       "Republican, strong"    = "Strong republican",
       "Republican, weak"      = "Not str republican",
       "Independent, near rep" = "Ind,near rep",
@@ -584,6 +589,7 @@ gss_cat |>
   ) |>
   count(partyid)
 ```
+
 {{< pagebreak >}}
 
 - **`fct_collapse()`** - A useful variant of fct_recode() if you want to collapse a lot of levels. For each new variable, you can provide a vector of old levels:
@@ -602,7 +608,8 @@ gss_cat |>
   ) |>
   count(partyid)
 ```
-- **`fct_lump_*()`** family of functions - lump together the small groups to make a plot or table simpler. 
+
+- **`fct_lump_*()`** family of functions - lump together the small groups to make a plot or table simpler.
 
 - **`fct_lump_lowfreq()`** is a simple starting point that progressively lumps the smallest group categories into “Other”, always keeping “Other” as the smallest category.
 
@@ -613,6 +620,7 @@ gss_cat |>
   mutate(relig = fct_lump_lowfreq(relig)) |>
   count(relig)
 ```
+
 {{< pagebreak >}}
 
 - **`fct_lump_n()`** - specify the exact n of groups:
@@ -623,6 +631,7 @@ gss_cat |>
   mutate(relig = fct_lump_n(relig, n = 10)) |>
   count(relig, sort = TRUE)
 ```
+
 - **`fct_lump_min()`** - lumps levels that appear fewer than min times. Preserves levels occurring at least `min` times and combines the rest:
 
 ```{r}
@@ -641,8 +650,7 @@ gss_cat |>
 
 ```
 
-
-- **`fct_lump_prop()`** - lumps levels that appear in fewer than (or equal to) prop * n times:
+- **`fct_lump_prop()`** - lumps levels that appear in fewer than (or equal to) prop \* n times:
 
 ```{r}
 
@@ -652,6 +660,7 @@ gss_cat |>
   count(relig, sort = TRUE) |>
   mutate(proportion = n / sum(n))
 ```
+
 {{< pagebreak >}}
 
 ```{r}
@@ -668,11 +677,12 @@ gss_cat |>
   mutate(proportion = n / sum(n))
 
 ```
+
 {{< pagebreak >}}
 
 ## Exercises
 
-1. How have the proportions of people identifying as Democrat, Republican, and Independent changed over time?
+1.  How have the proportions of people identifying as Democrat, Republican, and Independent changed over time?
 
 ```{r}
 #| fig-width: 10
@@ -680,7 +690,8 @@ gss_cat |>
 
 gss_cat |>
   mutate(
-    partyid = fct_recode(partyid,
+    partyid = fct_recode(
+      partyid,
       "Republican"  = "Strong republican",
       "Republican"  = "Not str republican",
       "Independent" = "Ind,near rep",
@@ -708,6 +719,7 @@ gss_cat |>
     color = ""
   )
 ```
+
 {{< pagebreak >}}
 
 ```{r}
@@ -734,6 +746,7 @@ party_proportion <-
   mutate(proportion = n / sum(n)) |>
   ungroup()
 ```
+
 {{< pagebreak >}}
 
 ```{r}
@@ -777,9 +790,10 @@ party_proportion <-
     legend.position = "none"
   )
 ```
+
 {{< pagebreak >}}
 
-2. How could you collapse rincome into a small set of categories?
+2.  How could you collapse rincome into a small set of categories?
 
 ```{r}
 
@@ -825,9 +839,10 @@ gss_cat |>
   ) |>
   count(rincome_grouped)
 ```
-3. Notice there are 9 groups (excluding other) in the fct_lump example above. Why not 10? (Hint: type ?fct_lump, and find the default for the argument other_level is “Other”.)
 
-Because "Other" is already an existing level of gss_cat$relig—and it is also the default name for the category created by fct_lump_n(). The function puts the newly lumped observations into that same "Other" category.
+3.  Notice there are 9 groups (excluding other) in the fct_lump example above. Why not 10? (Hint: type ?fct_lump, and find the default for the argument other_level is “Other”.)
+
+Because "Other" is already an existing level of gss_cat\$relig—and it is also the default name for the category created by fct_lump_n(). The function puts the newly lumped observations into that same "Other" category.
 
 - n = 10 preserves the ten most frequent original categories, including the original "Other"
 - Less frequent categories are relabelled "Other"
@@ -852,6 +867,7 @@ You can identify an ordered factor when it’s printed because it uses **`<`** s
 
 ordered(c("a", "b", "c"))
 ```
+
 Difference between ordered and regular factors:
 
 - If you map an ordered factor to color or fill in ggplot2, it will default to scale_color_viridis()/scale_fill_viridis(), a color scale that implies a ranking.
@@ -859,10 +875,5 @@ Difference between ordered and regular factors:
 - If you use an ordered predictor in a linear model, it will use “polynomial contrasts”. If you want to learn more, we recommend vignette("contrasts", package = "faux") by Lisa DeBruine.
 
 Reference index for forcats: https://forcats.tidyverse.org/reference/index.html
-
-
-
-
-
 
 {{< pagebreak >}}
