@@ -686,7 +686,7 @@ gss_cat |>
 
 ```{r}
 #| fig-width: 10
-#| fig-height: 10
+#| fig-height: 5
 
 gss_cat |>
   mutate(
@@ -720,8 +720,6 @@ gss_cat |>
   )
 ```
 
-{{< pagebreak >}}
-
 ```{r}
 
 party_proportion <-
@@ -751,8 +749,9 @@ party_proportion <-
 
 ```{r}
 #| fig-width: 10
-#| fig-height: 10
+#| fig-height: 7
 
+# second version of previous plot with legend colors applied to title
   ggplot(
     party_proportion, 
     aes(year, proportion, colour = partyid)
@@ -771,6 +770,7 @@ party_proportion <-
     y = "Proportion",
     title = str_c(
       "How have the proportions identifying as ",
+      # <br> is for break
       "<span style='color:#003CBA;'>Democrat</span>,<br>",
       "<span style='color:#E81B23;'>Republican</span>, and ",
       "<span style='color:#999999;'>Independent</span> ",
